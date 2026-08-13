@@ -1,0 +1,67 @@
+Hello! I'm working on a new design for the levitation PDU which takes the PWM signal and controls power to the 4 yokes. I need a few parameters from you guys before I can start designing and simulating it:
+What is the exact inductance and DC resistance of the yokes?
+Do you guys have an idea of the peak current as well as the normal baseline operating current?
+What PWM frequency (Hz) are you planning to run?
+Do you need current sensing for the PID loop on this board or are you already reading current elsewhere?
+Are screw terminals fine for the physical connection to the yokes?
+Are the yokes 2 wire floating loads or do they share a common ground reference?
+Please let me know if you have any questions, thanks.
+ 
+Will get to this tonight
+ 
+ooooops
+ 
+Aditya Sitaram Pulipaka added Matam, Aditya N to the chat and shared all chat history.
+
+ 
+I highkey don't remember the inductance / resistance values
+ 
+peak current per-yoke we want as much as you can reasonably provide tbh
+ 
+minimum is like 60A total across 4 yokes
+ 
+normal baseline operating current from lev should be like <5A for sure, super ideal would be <1A
+ 
+the motor controllers we currently have output PWM at 16KHz, and the Arduino maxes out at like 32KHz so if we do ever change the motor controller I think the max we'll go is 32KHz, not sure if ur looking for min or max but we def won't go below 16
+ 
+We don't have current sensing for PID right now (just control on the PWM ratio), and it doesn't look like it's super super necessary if we do proper control system design, but probably best for you guys to add it anyway in case we decide to use it.
+ 
+Idk why you're asking us about the screw terminals - it would seem like most motor controllers end up exposing that interface anyway, so I guess it's fine?
+ 
+yokes only share a common ground reference in the form of the negative terminals of the motor controllers being tied together
+ 
+at some point they will all have a common ground if you have one battery but no there is no real reason to have a common ground if you want them all floating
+ 
+all that matters is current through the coils
+ 
+Aditya Sitaram Pulipaka 
+I highkey don't remember the inductance / resistance values
+
+As I recall:
+
+- 4 ohm per coil
+
+- 10 mH per coil (inductance)
+Aditya Sitaram Pulipaka r we still doing parallel arrangement? Has anything changed on that front?
+ 
+I believe we were thinking wire in parallel to get higher peak current at the battery voltage
+ 
+Might be good to check numbers again
+ 
+Battery is 60V? What is peak current draw?
+ 
+Sorry forgetting all numbers
+ 
+ 
+Yea so even if we go with 60A max instantaneous for safety
+ 
+It’ll have to be 1ohm
+ 
+If we do coil pairs in series it’s 4 pairs so 4 of 8ohm so 2ohm effective
+ 
+Only get 30ohm
+ 
+To give us room (we can impose a hard limit both electrically and in SW) doing parallel gives 2 ohm each pair, which is 0.5 effective
+ 
+120a peak with 60v, we can again regulate voltage down + put a fuse
+ 

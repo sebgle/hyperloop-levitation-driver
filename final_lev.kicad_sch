@@ -1,0 +1,129 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "0a40c0f2-6b4c-4590-a920-c8cc820982d1")
+	(paper "A4")
+	(lib_symbols)
+	(sheet
+		(at 129.54 97.79)
+		(size 25.4 24.13)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "caa4a5a4-3670-4710-8301-952cca866c48")
+		(property "Sheetname" "power_channel"
+			(at 129.54 97.0784 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "power_channel.kicad_sch"
+			(at 129.54 122.936 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "PWM_A" input
+			(at 129.54 106.68 180)
+			(uuid "da4d0c04-7eca-426a-9635-b5423d939895")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "PWM_B" input
+			(at 129.54 102.87 180)
+			(uuid "257faf60-45f9-4aa8-b972-10a486d2a0d7")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "COIL_A" passive
+			(at 129.54 109.22 180)
+			(uuid "9311a23a-cd4c-45b2-a814-5536fe70ad02")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "COIL_B" passive
+			(at 129.54 111.76 180)
+			(uuid "9e4408c3-8e0d-4c37-86c7-f5539e36e110")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "ISNS" output
+			(at 129.54 114.3 180)
+			(uuid "1ba9f221-8831-44e0-aa94-e57b27e58ab7")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "FAULT" output
+			(at 129.54 116.84 180)
+			(uuid "461371c3-7195-4f80-b190-14256e0b7b78")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "RESET" input
+			(at 129.54 119.38 180)
+			(uuid "3589db0f-4727-488d-9838-e48e708a1adc")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "final_lev"
+				(path "/0a40c0f2-6b4c-4590-a920-c8cc820982d1"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

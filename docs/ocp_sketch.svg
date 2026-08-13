@@ -1,0 +1,162 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1360 700" width="1360" height="700">
+<style>
+  .w{stroke:#111;stroke-width:2.3;fill:none;stroke-linecap:round}
+  .pw{stroke:#111;stroke-width:3.6;fill:none;stroke-linecap:round}
+  .box{stroke:#111;stroke-width:2.6;fill:#fff}
+  .lbl{font-family:ui-sans-serif,-apple-system,Segoe UI,sans-serif;font-size:13px;fill:#111}
+  .bold{font-family:ui-sans-serif,-apple-system,Segoe UI,sans-serif;font-size:14px;fill:#111;font-weight:600}
+  .pin{font-family:ui-sans-serif,-apple-system,Segoe UI,sans-serif;font-size:12.5px;fill:#111}
+  .gray{font-family:ui-sans-serif,-apple-system,Segoe UI,sans-serif;font-size:11.5px;fill:#8a8f94}
+  .note{font-family:ui-sans-serif,-apple-system,Segoe UI,sans-serif;font-size:12px;fill:#b45309}
+</style>
+<rect width="1360" height="700" fill="#fcfcfa"/>
+
+<!-- ================= threshold divider ================= -->
+<line class="pw" x1="120" y1="58" x2="170" y2="58"/>
+<text class="bold" x="178" y="63">+3.3 V</text>
+<text class="gray" x="178" y="79">same rail as INA240</text>
+<line class="w" x1="145" y1="58" x2="145" y2="82"/>
+<path class="w" d="M145,82 l0,6 l-10,6 l20,10 l-20,10 l20,10 l-10,6 l0,6"/>
+<text class="lbl" x="122" y="115" text-anchor="end">10k</text>
+<line class="w" x1="145" y1="126" x2="145" y2="143"/>
+<circle cx="145" cy="143" r="4.5" fill="#111"/>
+<line class="w" x1="145" y1="143" x2="390" y2="143"/>
+<text class="bold" x="196" y="134">2.55 V   (+45 A)</text>
+
+<line class="w" x1="145" y1="143" x2="145" y2="205"/>
+<path class="w" d="M145,205 l0,6 l-10,6 l20,10 l-20,10 l20,10 l-20,10 l20,10 l-10,6 l0,6"/>
+<text class="lbl" x="122" y="255" text-anchor="end">24k</text>
+<line class="w" x1="145" y1="273" x2="145" y2="407"/>
+<circle cx="145" cy="407" r="4.5" fill="#111"/>
+<line class="w" x1="145" y1="407" x2="390" y2="407"/>
+<text class="bold" x="196" y="399">0.75 V   (−45 A)</text>
+
+<line class="w" x1="145" y1="407" x2="145" y2="432"/>
+<path class="w" d="M145,432 l0,6 l-10,6 l20,10 l-20,10 l20,10 l-10,6 l0,6"/>
+<text class="lbl" x="122" y="465" text-anchor="end">10k</text>
+<line class="w" x1="145" y1="476" x2="145" y2="505"/>
+<path class="w" d="M128,505 L162,505 L145,526 Z"/>
+
+<!-- ================= ISNS bus ================= -->
+<line class="w" x1="40" y1="625" x2="340" y2="625"/>
+<text class="bold" x="40" y="615">ISNS</text>
+<text class="gray" x="40" y="645">from INA240 OUT</text>
+<line class="w" x1="340" y1="625" x2="340" y2="419"/>
+<path class="w" d="M340,419 A 11,11 0 0 1 340,395"/>
+<line class="w" x1="340" y1="395" x2="340" y2="177"/>
+<circle cx="340" cy="373" r="4.5" fill="#111"/>
+<line class="w" x1="340" y1="373" x2="390" y2="373"/>
+<line class="w" x1="340" y1="177" x2="390" y2="177"/>
+
+<!-- ================= comparator A ================= -->
+<path class="box" d="M390,110 L390,210 L485,160 Z"/>
+<text class="pin" x="401" y="149">+</text>
+<text class="pin" x="401" y="185">−</text>
+<text class="bold" x="404" y="101">A</text>
+<line class="w" x1="485" y1="160" x2="570" y2="160"/>
+<circle cx="570" cy="160" r="4.5" fill="#111"/>
+
+<!-- ================= comparator B ================= -->
+<path class="box" d="M390,340 L390,440 L485,390 Z"/>
+<text class="pin" x="401" y="379">+</text>
+<text class="pin" x="401" y="415">−</text>
+<text class="bold" x="404" y="332">B</text>
+<line class="w" x1="485" y1="390" x2="570" y2="390"/>
+<circle cx="570" cy="390" r="4.5" fill="#111"/>
+
+<!-- ================= wired-OR + pull-up ================= -->
+<line class="w" x1="570" y1="160" x2="570" y2="390"/>
+<line class="w" x1="570" y1="160" x2="570" y2="122"/>
+<path class="w" d="M570,122 l0,-6 l-10,-6 l20,-10 l-20,-10 l20,-10 l-10,-6 l0,-6"/>
+<text class="lbl" x="592" y="90">10k</text>
+<line class="w" x1="570" y1="68" x2="570" y2="58"/>
+<line class="pw" x1="545" y1="58" x2="595" y2="58"/>
+<text class="bold" x="603" y="63">+5 V</text>
+
+<line class="w" x1="570" y1="275" x2="655" y2="275"/>
+<line class="w" x1="655" y1="275" x2="655" y2="250"/>
+<line class="w" x1="655" y1="250" x2="690" y2="250"/>
+<text class="bold" x="576" y="240">FAULT_N</text>
+<text class="gray" x="576" y="256">low = fault</text>
+
+<!-- ================= 74HC74 ================= -->
+<rect x="690" y="210" width="240" height="190" class="box"/>
+<text class="bold" x="820" y="300" text-anchor="middle">74HC74</text>
+<text class="gray" x="820" y="320" text-anchor="middle">latch</text>
+<text class="pin" x="700" y="255">/PRE</text>
+<text class="pin" x="700" y="330">D</text>
+<text class="pin" x="700" y="375">CLK</text>
+<text class="pin" x="920" y="255" text-anchor="end">Q</text>
+<text class="pin" x="800" y="204">VCC</text>
+<text class="pin" x="712" y="418">/CLR</text>
+<text class="pin" x="862" y="418">GND</text>
+
+<line class="w" x1="820" y1="210" x2="820" y2="178"/>
+<line class="pw" x1="795" y1="178" x2="845" y2="178"/>
+<text class="bold" x="853" y="183">+5 V</text>
+<line class="w" x1="885" y1="400" x2="885" y2="445"/>
+<path class="w" d="M868,445 L902,445 L885,466 Z"/>
+
+<line class="w" x1="690" y1="330" x2="660" y2="330"/>
+<line class="w" x1="690" y1="373" x2="660" y2="373"/>
+<line class="w" x1="660" y1="330" x2="660" y2="445"/>
+<path class="w" d="M643,445 L677,445 L660,466 Z"/>
+<text class="gray" x="648" y="352" text-anchor="end">D, CLK unused</text>
+
+<!-- /CLR reset network -->
+<line class="w" x1="735" y1="400" x2="735" y2="545"/>
+<circle cx="735" cy="545" r="4.5" fill="#111"/>
+<path class="w" d="M735,545 l6,0 l6,-10 l10,20 l10,-20 l10,20 l6,-10 l6,0"/>
+<line class="w" x1="789" y1="545" x2="880" y2="545"/>
+<line class="w" x1="880" y1="545" x2="880" y2="512"/>
+<line class="pw" x1="855" y1="512" x2="905" y2="512"/>
+<text class="bold" x="913" y="517">+5 V</text>
+<text class="lbl" x="762" y="572" text-anchor="middle">10k</text>
+
+<line class="w" x1="735" y1="545" x2="735" y2="590"/>
+<line class="pw" x1="713" y1="590" x2="757" y2="590"/>
+<line class="pw" x1="713" y1="610" x2="757" y2="610"/>
+<line class="w" x1="735" y1="610" x2="735" y2="640"/>
+<path class="w" d="M718,640 L752,640 L735,661 Z"/>
+<text class="lbl" x="766" y="606">100 nF</text>
+
+<line class="w" x1="560" y1="545" x2="735" y2="545"/>
+<path class="w" d="M552,539 l10,6 l-10,6"/>
+<text class="bold" x="452" y="550">RESET in</text>
+<text class="gray" x="452" y="566">from connector</text>
+
+<text class="note" x="810" y="655">power-on reset — the cap holds /CLR low at start-up,</text>
+<text class="note" x="810" y="671">so the latch always powers up in the no-fault state</text>
+
+<!-- ================= Q output ================= -->
+<line class="w" x1="930" y1="250" x2="1010" y2="250"/>
+<circle cx="1010" cy="250" r="4.5" fill="#111"/>
+<line class="w" x1="1010" y1="250" x2="1010" y2="190"/>
+<line class="w" x1="1010" y1="190" x2="1150" y2="190"/>
+<path class="w" d="M1142,184 l10,6 l-10,6"/>
+<text class="bold" x="1160" y="195">FAULT</text>
+<text class="gray" x="1160" y="211">→ connector</text>
+
+<line class="w" x1="1010" y1="250" x2="1045" y2="250"/>
+<path class="box" d="M1045,228 L1045,272 L1085,250 Z"/>
+<circle cx="1091" cy="250" r="6.5" class="box"/>
+<line class="w" x1="1098" y1="250" x2="1150" y2="250"/>
+<circle cx="1150" cy="250" r="4.5" fill="#111"/>
+<line class="w" x1="1010" y1="250" x2="1010" y2="312"/>
+<line class="w" x1="1010" y1="312" x2="1150" y2="312"/>
+<line class="w" x1="1150" y1="312" x2="1150" y2="250"/>
+<text class="lbl" x="1080" y="332" text-anchor="middle">0 Ω link</text>
+<line class="w" x1="1150" y1="250" x2="1245" y2="250"/>
+<path class="w" d="M1237,244 l10,6 l-10,6"/>
+<text class="bold" x="1255" y="255">SD</text>
+<text class="gray" x="1255" y="271">both IR2184</text>
+<text class="note" x="1000" y="368">populate ONE — inverter</text>
+<text class="note" x="1000" y="384">or link — once you've</text>
+<text class="note" x="1000" y="400">read the SD truth table</text>
+
+<!-- notes -->
+<text class="gray" x="392" y="470">both halves of one LM393 — run it from +5 V</text>
+<text class="note" x="392" y="492">Inputs are CROSSED on purpose: both trip LOW, so tying the</text>
+<text class="note" x="392" y="508">open-drain outputs together gives OR, not AND.</text>
+<text class="note" x="40" y="686">Not drawn: 100 nF from VCC to GND at the LM393 and at the 74HC74.</text>
+</svg>
