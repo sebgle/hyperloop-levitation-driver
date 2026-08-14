@@ -532,3 +532,44 @@ Superseded recommendations in the body above: **§4** (the +3.3 V blocking diode
 **§7** (the claim that the divider needs no other change — R15 does move, and the ratiometric
 claim was wrong), **§10** (the 3k3/10k divider values), and **§5** (sign-magnitude — superseded
 by unipolar 3-level PWM, see A14 in `09_design_sheet_rev0.md`).
+
+
+---
+
+# ADDENDUM 2 — full re-review at the committed operating point, 2026-08-14 night
+
+A third pass, this time over the **whole** design rather than the delta, on the grounds that
+A14 changed the operating point everything had been analysed against. Fourteen findings. The
+largest was an error in A14 itself.
+
+**The interleave angle was wrong.** A14 specified 180°. Under unipolar PWM the bus draws
+current twice per carrier period, so a 180° shift is a full cycle of the ripple fundamental
+and cancels nothing — numerically identical to running both channels in phase, 30.0 A rms
+against a 14.1 A bank. **Corrected to 90°**, which gives 0.1 A at the design duty.
+
+Other confirmed findings, not yet actioned:
+
+- **Conduction splits 3:1 at D = 0.75.** Q1 and Q4 conduct 75 % of the period *and* take all
+  the hard switching; Q2 and Q3 conduct 25 % and switch at zero volts. The 1.35 °C/W heatsink
+  figure assumed even sharing across eight devices. Worst-device dissipation is somewhere
+  between 8.0 W and 13.7 W depending on switching-time assumptions — needs bench measurement,
+  not more analysis.
+- **U5 pin 2 (D) tied to GND is the fail-dangerous choice.** A CLK-line glitch clocks a zero
+  in, releasing SD out of a latched fault. Tie D to +5 V and the same glitch commands
+  shutdown instead. One wire. **Actioned.**
+- **The power-on reset is defeated if +5 V rises slower than ~7 ms**, because its RC is
+  powered from the rail it is meant to qualify.
+- **While RESET is held low the latch is transparent, not latching** — and the C22 → 1 µF fix
+  in Addendum 1 lengthened that window fivefold.
+- Bootstrap refresh, shunt derating at the trip point, and the R27/C27 blanking value all
+  need re-deriving once the coil is measured.
+
+**Three findings were refuted as artifacts of the review packet, not the schematic:** CH2
+"missing" the new parts, U5's three outputs "shorted together", and an IR2184 pin
+transposition. All three traced to errors in how the packet was written, and all three were
+checked against the raw netlist before being dismissed.
+
+**Convergence: 19 → 5 → 14 findings.** Roughly 40 % of this round traces to changes made in
+the previous two rounds. That is the signal to stop point-fixing. **The next action is not
+another review — it is to measure the coil and re-derive the operating point once, as a
+whole, because that is the input every one of these numbers depends on.**

@@ -13,7 +13,7 @@
 		(comment 2 "Instantiated twice. Rails arrive from the pod on IO_PROTECT; bulk caps on BUS.")
 		(comment 3 "PROVISIONAL — coil L, k and R are unmeasured. See assumption register on this sheet.")
 		(comment 4 "Design record: docs/09_design_sheet_rev0.md · review: docs/16_adversarial_review.md")
-		(comment 5 "MODULATION: unipolar 3-level PWM (leg A = D, leg B = 1-D). Channels interleaved 180 deg. The 180 deg interleave is required, not optional - see A14.")
+		(comment 5 "MODULATION: unipolar 3-level PWM (leg A = D, leg B = 1-D). Channels interleaved 90 deg. The 90 deg interleave is required, not optional - see A14.")
 	)
 	(lib_symbols
 		(symbol "74xx:74HCT74"
@@ -14895,6 +14895,88 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+5V")
+		(at 218.44 100.33 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "c4023e3a-4635-40c5-b818-cc1d2752fb0b")
+		(property "Reference" "#PWR0241"
+			(at 218.44 104.14 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+5V"
+			(at 218.44 95.25 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 218.44 100.33 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 218.44 100.33 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+5V\""
+			(at 218.44 100.33 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "554855f2-8e23-4dff-a600-033ccac81924")
+		)
+		(instances
+			(project "final_lev"
+				(path "/0a40c0f2-6b4c-4590-a920-c8cc820982d1/4e830c1e-538f-4dbb-bf01-d2466ce385dd"
+					(reference "#PWR0242")
+					(unit 1)
+				)
+				(path "/0a40c0f2-6b4c-4590-a920-c8cc820982d1/caa4a5a4-3670-4710-8301-952cca866c48"
+					(reference "#PWR0241")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Comparator:LM393")
 		(at 143.51 72.39 0)
 		(unit 2)
@@ -15674,89 +15756,6 @@
 				)
 				(path "/0a40c0f2-6b4c-4590-a920-c8cc820982d1/caa4a5a4-3670-4710-8301-952cca866c48"
 					(reference "C26")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 218.44 100.33 270)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "d3b3ac9a-abc9-48d4-96b9-3d8a6e292aef")
-		(property "Reference" "#PWR021"
-			(at 212.09 100.33 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 214.63 100.3299 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" ""
-			(at 218.44 100.33 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 218.44 100.33 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 218.44 100.33 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "9d4d0537-62a0-42cd-91dc-1e7251f43244")
-		)
-		(instances
-			(project "final_lev"
-				(path "/0a40c0f2-6b4c-4590-a920-c8cc820982d1/4e830c1e-538f-4dbb-bf01-d2466ce385dd"
-					(reference "#PWR0329")
-					(unit 1)
-				)
-				(path "/0a40c0f2-6b4c-4590-a920-c8cc820982d1/caa4a5a4-3670-4710-8301-952cca866c48"
-					(reference "#PWR021")
 					(unit 1)
 				)
 			)

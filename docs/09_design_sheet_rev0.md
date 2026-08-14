@@ -37,7 +37,7 @@ with the design instead of living in your head.
 | A11 | Mounting | **4 × M3**, Ø3.2 mm, on a 150 × 90 mm rectangle | Decided 2026-08-14. Standard PCB standoff hardware | Decision | Hole pattern moves | Move 4 holes + keepouts. Trivial before routing |
 | A12 | Chassis bond | Mounting holes **isolated**; 0 Ω 1206 jumper to GND fitted at the bus-entry hole, **DNF** | Yokes float; only common point is at the motor-controller negatives (`03_open_questions.md`). A bonded screw creates an unplanned 60 A return path through the pod structure | Medium | If chassis bonding is required | **Stuff one 0 Ω part.** No re-spin — this is why the provision exists |
 | A13 | Harness entry | Bus in on one short edge, coils out on the other; logic on the far long edge | Decided 2026-08-14. Follows the current path: bus → bulk → bridge → shunt → coils | Decision | Connector edges move | Re-do placement of 4 connectors and the high-current pours |
-| A14 | **Modulation scheme** | **Unipolar (3-level) PWM** — leg A at D, leg B at 1−D; the two channels interleaved **180°** | Decided 2026-08-14. Bus ripple, plus linearity through zero | Decision | If locked antiphase is mandated: bus ripple 52 A rms against a ~14 A bank | **Capacitor bank moves to polymer or film.** BUS sheet respin + BOM |
+| A14 | **Modulation scheme** | **Unipolar (3-level) PWM** — leg A at D, leg B at 1−D; the two channels interleaved **90°** | Decided 2026-08-14. Bus ripple, plus linearity through zero | Decision | If locked antiphase is mandated: bus ripple 52 A rms against a ~14 A bank | **Capacitor bank moves to polymer or film.** BUS sheet respin + BOM |
 
 **Three of the four blockers are removed by design in §3, not by assumption.** Only A1 and A2
 really matter, and A2 is neutralised.
@@ -70,6 +70,25 @@ linear through zero — D = 0.5 means zero volts, zero coil current, and **zero 
 
 Unipolar also halves the coil's own ripple and doubles its frequency, because the coil sees
 +V / 0 / −V at 2·f_sw.
+
+**THE INTERLEAVE ANGLE IS 90°, NOT 180° — corrected 2026-08-14 night.** Under unipolar the
+bus draws current only while Q1 and Q4 are both on, which happens **twice per carrier
+period**, so the bus-ripple fundamental is at 2·f_sw. A 180° carrier shift is a full 360° of
+that fundamental and cancels **nothing** — it is bit-identical to running the two channels in
+phase. Verified numerically:
+
+| | in phase | 180° | 90° |
+|---|---:|---:|---:|
+| ripple at D = 0.75 | 30.0 A | **30.0 A** | **0.1 A** |
+| ripple at D = 0.875 | 26.0 A | 26.0 A | 15.0 A |
+| bank capability | | | 14.1 A |
+
+The 180° figure was carried over from the locked-antiphase analysis, where the ripple
+fundamental *is* at f_sw and 180° genuinely cancels. It does not transfer. At 180° the bank
+would have run at 2.1× its ripple rating.
+
+Note the D = 0.875 row: even at 90° the bank is marginal at high duty. Either the duty needs
+a clamp or the bank needs more cans — resolve when the coil is measured.
 
 **Cost, stated honestly.** Dead time now distorts both legs rather than one, so there is a
 small duty-dependent error near zero that firmware may need to compensate. That is a

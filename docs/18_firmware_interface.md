@@ -118,7 +118,7 @@ amplifier — see §7.
 
 ## 5. Modulation — committed, not a free choice
 
-**Unipolar (3-level) PWM, and the two channels interleaved 180°.**
+**Unipolar (3-level) PWM, and the two channels interleaved 90°.**
 
 ```
    PWM_A = D
@@ -131,10 +131,11 @@ amplifier — see §7.
 The IR2184 generates each leg's complement internally and enforces its own dead time, so you
 drive **one signal per leg** and never both halves of a bridge.
 
-**The 180° interleave is a hardware requirement, not an optimisation.** Channel 2's carrier
-must be phase-shifted half a period from channel 1's. The bulk capacitor bank is sized on the
-assumption that the two channels' bus current pulses do not coincide. Share a carrier with no
-offset and bus ripple roughly doubles, past what the bank can carry — see A14 in
+**The 90° interleave is a hardware requirement, not an optimisation.** Channel 2's carrier
+must be phase-shifted a **quarter** period from channel 1's — not half. Under unipolar the
+bus draws current twice per carrier period, so the ripple fundamental is at 2·f_sw; a half-
+period shift is a full cycle of that and cancels nothing. The bulk capacitor bank is sized on the
+assumption that the two channels' bus current pulses do not coincide. A half-period shift, or no offset at all, leaves the bus ripple at 30 A rms against a bank rated 14 A, past what the bank can carry — see A14 in
 `09_design_sheet_rev0.md`.
 
 **Do not use locked antiphase.** It needs ~52 A rms of bus ripple against a bank rated for
