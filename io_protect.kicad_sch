@@ -3778,6 +3778,17 @@
 				)
 			)
 		)
+		(property "Voltage" "25V"
+			(at 208.28 88.9 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "7df4df6a-e17d-4b1a-a881-b03afc1e7e7e")
 		)
@@ -4098,6 +4109,17 @@
 				)
 			)
 		)
+		(property "Voltage" "25V"
+			(at 40.64 228.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "3345219f-52e9-40ae-93d0-a909a1ce19f6")
 		)
@@ -4326,6 +4348,17 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 102.87 229.87 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Voltage" "25V"
 			(at 102.87 229.87 0)
 			(hide yes)
 			(show_name no)
@@ -4946,6 +4979,17 @@
 				)
 			)
 		)
+		(property "Voltage" "25V"
+			(at 267.97 180.34 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "20d619a1-5f2c-4202-bbf6-a11de651e1ec")
 		)
@@ -5098,6 +5142,17 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 187.96 60.96 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Voltage" "25V"
 			(at 187.96 60.96 0)
 			(hide yes)
 			(show_name no)
@@ -6098,6 +6153,17 @@
 				)
 			)
 		)
+		(property "Voltage" "25V"
+			(at 280.67 193.04 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "8dc573c0-b1e5-4dfe-91d8-4fe4dc0e6024")
 		)
@@ -6487,6 +6553,17 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 242.57 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Voltage" "25V"
 			(at 242.57 167.64 0)
 			(hide yes)
 			(show_name no)
@@ -7433,6 +7510,17 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
+			(at 293.37 193.04 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Voltage" "25V"
 			(at 293.37 193.04 0)
 			(hide yes)
 			(show_name no)
