@@ -6,13 +6,14 @@
 	(paper "A3")
 	(title_block
 		(title "Levitation Coil Drive — Power Channel")
-		(date "2026-08-13")
+		(date "2026-08-14")
 		(rev "0")
 		(company "Guadaloop — Power Electronics Subsystem")
 		(comment 1 "Full H-bridge, bidirectional coil drive. 60 V bus · 30 A design · ±45 A trip.")
-		(comment 2 "Instantiated twice. Rails on AUX_RAILS, connectors + buffers on IO_PROTECT, bulk caps on BUS.")
+		(comment 2 "Instantiated twice. Rails arrive from the pod on IO_PROTECT; bulk caps on BUS.")
 		(comment 3 "PROVISIONAL — coil L, k and R are unmeasured. See assumption register on this sheet.")
-		(comment 4 "Design record: levpdu/09_design_sheet_rev0.md · review: levpdu/13_schematic_review_power_channel.md rev 1")
+		(comment 4 "Design record: docs/09_design_sheet_rev0.md · review: docs/16_adversarial_review.md")
+		(comment 5 "MODULATION: unipolar 3-level PWM (leg A = D, leg B = 1-D). Channels interleaved 180 deg. The 180 deg interleave is required, not optional - see A14.")
 	)
 	(lib_symbols
 		(symbol "74xx:74HCT00"

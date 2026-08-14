@@ -37,9 +37,55 @@ with the design instead of living in your head.
 | A11 | Mounting | **4 × M3**, Ø3.2 mm, on a 150 × 90 mm rectangle | Decided 2026-08-14. Standard PCB standoff hardware | Decision | Hole pattern moves | Move 4 holes + keepouts. Trivial before routing |
 | A12 | Chassis bond | Mounting holes **isolated**; 0 Ω 1206 jumper to GND fitted at the bus-entry hole, **DNF** | Yokes float; only common point is at the motor-controller negatives (`03_open_questions.md`). A bonded screw creates an unplanned 60 A return path through the pod structure | Medium | If chassis bonding is required | **Stuff one 0 Ω part.** No re-spin — this is why the provision exists |
 | A13 | Harness entry | Bus in on one short edge, coils out on the other; logic on the far long edge | Decided 2026-08-14. Follows the current path: bus → bulk → bridge → shunt → coils | Decision | Connector edges move | Re-do placement of 4 connectors and the high-current pours |
+| A14 | **Modulation scheme** | **Unipolar (3-level) PWM** — leg A at D, leg B at 1−D; the two channels interleaved **180°** | Decided 2026-08-14. Bus ripple, plus linearity through zero | Decision | If locked antiphase is mandated: bus ripple 52 A rms against a ~14 A bank | **Capacitor bank moves to polymer or film.** BUS sheet respin + BOM |
 
 **Three of the four blockers are removed by design in §3, not by assumption.** Only A1 and A2
 really matter, and A2 is neutralised.
+
+
+### A14 — why unipolar, in full
+
+This is the assumption the capacitor bank rests on, so the reasoning is written out rather
+than left implicit.
+
+The coil is effectively a DC source to the bus — its own ripple is 0.15 A pk-pk against 30 A —
+so whatever fraction of the period the bridge draws from the bus, it draws the *full* 30 A.
+That fraction is what sets the bus RMS ripple, and it differs by a factor of three across the
+three candidate schemes:
+
+| Scheme | Bus draws for | AC ripple, 1 ch | 2 ch in phase | 2 ch interleaved 180° |
+|---|---|---:|---:|---:|
+| Locked antiphase | the whole period, sign-reversing | 25.98 A | **51.96 A** | 30.0 A |
+| Sign-magnitude | D = 0.5 | 15.00 A | 30.0 A | ≈ 0 |
+| **Unipolar (3-level)** | \|2D−1\| = 0.5 | **15.00 A** | 30.0 A | **≈ 0** |
+
+Six Rubycon ZLH cans give roughly **14 A**. Locked antiphase is off the table on that alone.
+
+Between the other two, the deciding factor is **behaviour at zero current, not ripple** —
+they are identical on ripple. HEMS force goes as (B_pm ± B_coil)², so with the magnets
+carrying static weight the coil current trims about zero and crosses it routinely.
+Sign-magnitude cannot cross zero continuously: the direction leg has to flip, which puts a
+deadband and a discontinuity exactly at the operating point the loop lives at. Unipolar is
+linear through zero — D = 0.5 means zero volts, zero coil current, and **zero bus draw**.
+
+Unipolar also halves the coil's own ripple and doubles its frequency, because the coil sees
++V / 0 / −V at 2·f_sw.
+
+**Cost, stated honestly.** Dead time now distorts both legs rather than one, so there is a
+small duty-dependent error near zero that firmware may need to compensate. That is a
+calibration, not a topology problem. And the 180° interleave has to be real — if both
+channels share a carrier with no phase offset, the bus ripple doubles to 30 A and the bank is
+marginal again. **The interleave is a hard requirement of this assumption, not an
+optimisation.**
+
+**What this supersedes.** `16_adversarial_review.md` §5 recommended sign-magnitude. That was
+right about locked antiphase being unaffordable and wrong to stop there — it optimised for
+bus ripple alone and did not check the zero-crossing behaviour against the PM-biased
+operating point. Unipolar gives the same ripple without the deadband.
+
+**What still needs doing.** `09_design_sheet_rev0.md` §4.1 sizes the FET losses under
+"Antiphase (design to this)". Those numbers need re-deriving for unipolar before the thermal
+design is final — switching loss should fall, because each leg hard-switches less often.
 
 ---
 

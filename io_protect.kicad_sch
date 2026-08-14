@@ -4829,7 +4829,7 @@
 				)
 			)
 		)
-		(property "Value" "Conn_02x08_Odd_Even"
+		(property "Value" "CONTROL"
 			(at 71.12 49.53 0)
 			(show_name no)
 			(do_not_autoplace no)
