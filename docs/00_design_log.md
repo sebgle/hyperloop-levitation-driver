@@ -1238,3 +1238,109 @@ remembering the next time a clean toolchain feels like an answer.
 Schematic is **re-opened**, not closed. Seven pre-layout changes, one modulation decision,
 and two questions for other people (electronics-bay pressure; whether the slow-decay circuit
 gets built for rev 0). Placement waits on those.
+
+---
+
+## 2026-08-14 (evening) — the seven pre-layout fixes, built and verified
+
+Executed `17_rev0_fix_plan.md` blocks 1–6 interactively, one step at a time, with the
+netlist re-extracted from raw geometry after every save. Block 7 (the modulation decision)
+is a decision, not an edit, and is still open.
+
+### What changed
+
+**Set-dominance and MCU authority — one package.** A **74HCT00** per channel (U6 / U208)
+with all four gates used:
+
+    RESET ──[A: tied inputs]──► RESET_N
+            [B: RESET_N, FAULT_N]──► RESET_EFF ──► U5.1 (/R)
+    U5.6 (/Q) ──[C: with EN]──► SD_N ──[D: tied inputs]──► SD_DRV ──[R26 3k3]──► SD
+
+`RESET_EFF = RESET OR NOT(FAULT_N)` — the latch cannot be cleared while the comparators are
+still calling a fault. `SD_DRV = /Q AND EN` — the MCU can now command shutdown, which it
+previously could not do at all. R26 against the existing R19 also drops SD from 5 V to
+3.76 V, inside the IR2184's 4 V recommended input maximum instead of sitting on its absolute
+maximum. HCT rather than HC because EN arrives from a 3.3 V MCU.
+
+**Gate drivers can no longer float.** R24/R25 10 k at the IR2184 IN pins — on the *driver*
+side, because the 74LVC2G17's Ioff makes its outputs high-Z when the 3.3 V rail dies, so
+R201–R204 hold nothing. Plus D210 (SS34) + C233 (220 µF) on +3.3 V, matching what +12 V and
++5 V already had.
+
+**Sense chain.** R11 1 mΩ → **0.5 mΩ**, U3 → **INA240A2D** (gain 50), R15 24 k → **43 k**,
+U4 → **LM2903B**, U5 → **74HCT74**. C25/C26 bypass the two threshold nodes, which had been
+sitting at 7.7 kΩ with nothing on them; R27 (1 k) + C27 (4.7 nF) give 4.7 µs of blanking
+into the comparators while leaving the telemetry tap unfiltered.
+
+**Bus sheet.** C101–C106 to `CP_Radial_D16.0mm_P7.50mm` with a real part —
+**100ZLH470MEFC16X31.5**, Rubycon ZLH, 2.4 A rms. R101 to 2512.
+
+**Connector.** J202 12-way single-row → **2×8 Micro-Fit 3.0, Molex 43045-1600**, repinned so
+every PWM line has an adjacent ground and RESET is no longer beside one. FAULT became **OK**:
+sourced from SD_DRV instead of Q, through a 10 k / 15 k divider. That inverts the failure
+sense — unpowered, unplugged, broken wire and lost +5 V now all read *not healthy*, where
+before every one of them read healthy. The same divider removes the 9–19 mA that was being
+injected into the MCU's clamp diode through the old 100 Ω.
+
+### Verification
+
+- **ERC: 0 errors.** Two warnings, both the intentional dual-naming kind (SW_B/COIL_B, and
+  now SD_DRV/OK).
+- **F8: 0 errors, 0 warnings, 181 footprints.** Schematic and PCB agree on 181 parts with no
+  orphans in either direction.
+- **Netlist cross-check: exact match on all 100 nets, 494 pads, pin for pin**, between
+  KiCad's own sync and a reconstruction built from raw symbol geometry.
+- **No annotation run was needed** — everything was already numbered, and this time KiCad
+  assigned 40 unique `#PWR` references per channel with zero overlap. The 08-13 problem did
+  not recur.
+
+### Four things that went wrong, and what they teach
+
+**1. KiCad split a multi-unit package across five reference designators.** In the CH2
+instance path, U6's five units came out as U209, U211, U213, U215, U210 — five separate
+SOIC-14 chips as far as the board was concerned. CH1's path was fine. Same root cause as the
+`#PWR` duplicates: **per-instance annotation on a multi-instance sheet is not automatic, and
+"keep existing" will preserve whatever is already broken.** Fixed by patching both the
+reference *and* the `unit` field in each path entry — the references alone were not enough,
+because KiCad had also written `unit 1` five times.
+
+**2. A file patch was silently reverted by a save.** I renamed a reference while KiCad had
+the file open; his next save wrote the in-memory copy back over it. An earlier patch survived
+only because the editor was closed at the time. **Rule adopted: no file surgery while the
+editor is open**, and reference tidying is batched to the end rather than done per-step.
+
+**3. My arithmetic was wrong in the review document.** I wrote that 0.5 mΩ with an INA240A2
+keeps 20 mV/A and leaves the threshold divider alone. It does not — 0.5 mΩ × 50 = **25 mV/A**,
+and holding 20 mV/A would need a 0.4 mΩ shunt, which the WSK2512 does not offer. The real fix
+needs R15 to move 24 k → 43 k to keep the trip at 45 A. Caught while writing the step-by-step
+plan, corrected in `16_adversarial_review.md` §7. Worth noting *why* it was caught: writing
+out the executable steps forced the number to be used rather than asserted.
+
+**4. I quoted a mating half instead of a board half.** I gave Molex **43025**-1600 for J202;
+that is the wire-side receptacle housing. The board part is **43045**-1600, and the KiCad
+footprint name said so. Third connector-related error of the project, and the second time a
+library or vendor artifact caught me before it cost anything.
+
+### One place the tooling was wrong and the schematic was right
+
+The cross-check flagged J202's five ground pins as an island. They had been given plain text
+labels `GND` rather than `power:GND` symbols, and my extractor scopes local labels to their
+sheet. KiCad merged them into the global ground — the PCB net is `"GND"` with no sheet prefix,
+so **the board was correct and my tool was wrong.**
+
+Changed the schematic anyway, to power symbols: the other twelve grounds on that sheet use
+them, and depending on a label-scoping subtlety to make a ground connection is not something
+that should be load-bearing. After the change, 100 of 100 nets match.
+
+Third tooling bug the cross-check has surfaced, after the mirror transform on R8 and the
+PWR_FLAG welding. Every one of them was found by disagreement rather than by inspection,
+which is the argument for keeping two independent views of the same file.
+
+### Still open
+
+- **A14, the modulation commitment** — sign-magnitude interleaved 180° vs locked antiphase.
+  Everything about the capacitor bank depends on it, and §4.1 of the design sheet currently
+  sizes the FETs under the *other* answer. Not an edit; a decision that has to be written
+  down.
+- Findings 13–16 and 18–19 from the review, deferred by plan.
+- Commit, then placement.
