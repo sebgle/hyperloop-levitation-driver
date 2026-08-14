@@ -33,6 +33,10 @@ with the design instead of living in your head.
 | A7 | Aux rails | Board generates its own 12 V and 3.3 V from the 60 V bus | Nobody has said the pod supplies them | Medium | If pod supplies them, DNF the regulator | **DNF one part** |
 | A8 | 30 A/yoke is real | Design to 30 A | Safe upper bound whether real or inherited | Conservative | Over-designed | None |
 | A9 | Bus voltage | 60 V **max** (not nominal) | EDD §2.1 states "Input Voltage (Max)" | High | If nominal, top-of-charge ~67 V → 100 V FETs get tight | Re-check FET margin |
+| A10 | Board outline | **160 × 100 mm** (Eurocard) | Decided 2026-08-14, no upstream constraint stated. Set by the 8× TO-220 row (~120 mm) and the §4.2 heatsink estimate (~150 × 100 mm) | Decision, not measurement | Outline changes | Re-do placement. No schematic impact. Cheapest thing here to change *before* routing, expensive after |
+| A11 | Mounting | **4 × M3**, Ø3.2 mm, on a 150 × 90 mm rectangle | Decided 2026-08-14. Standard PCB standoff hardware | Decision | Hole pattern moves | Move 4 holes + keepouts. Trivial before routing |
+| A12 | Chassis bond | Mounting holes **isolated**; 0 Ω 1206 jumper to GND fitted at the bus-entry hole, **DNF** | Yokes float; only common point is at the motor-controller negatives (`03_open_questions.md`). A bonded screw creates an unplanned 60 A return path through the pod structure | Medium | If chassis bonding is required | **Stuff one 0 Ω part.** No re-spin — this is why the provision exists |
+| A13 | Harness entry | Bus in on one short edge, coils out on the other; logic on the far long edge | Decided 2026-08-14. Follows the current path: bus → bulk → bridge → shunt → coils | Decision | Connector edges move | Re-do placement of 4 connectors and the high-current pours |
 
 **Three of the four blockers are removed by design in §3, not by assumption.** Only A1 and A2
 really matter, and A2 is neutralised.

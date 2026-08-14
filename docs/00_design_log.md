@@ -32,6 +32,9 @@ and why — including the things that turned out to be wrong.
 | 06 | HEMS slide + LEV EDD findings — **includes retractions of three Day-1 findings** | rev 1 |
 
 ---
+- `16_adversarial_review.md` — hostile review of the full schematic, 19 findings, datasheet-verified
+- `17_rev0_fix_plan.md` — the executable fix list: 7 blocks, ~19 new parts, ~3 hours
+
 
 ## 2026-08-11 · Day 1
 
@@ -889,3 +892,349 @@ instance path, and "keep existing" will not make them unique for you.**
 One custom footprint (Molex 38969-0002, used by J101/J203/J204). J201 and J202 still need
 real parts chosen — pick something KiCad already has footprints for and that count goes to
 zero. Board Setup values and 2 oz copper are done.
+
+---
+
+## 2026-08-14 (later) — footprints, connectors, and a retraction I should not have needed
+
+The schematic was electrically finished. What stood between it and a board was that a
+footprint is a physical claim — this part, these pads, this pitch — and nothing in ERC
+checks whether that claim is true. Every error in this phase is silent until a part
+arrives and does not fit.
+
+### Connectors: single-row Micro-Fit, chosen to avoid rework
+
+J201 and J202 (the logic-side connectors) were the last parts with no footprint. The
+question was not "which connector is best" but "which connector do the symbols already
+drawn support without redrawing them", because the symbols are single-row `Conn_01x04` and
+`Conn_01x12`.
+
+    J201  Molex Micro-Fit 3.0  43650-0400   1×04  P3.00mm  Horizontal
+    J202  Molex Micro-Fit 3.0  43650-1200   1×12  P3.00mm  Horizontal
+
+Micro-Fit 3.0 rather than a header strip because these carry PWM, RESET, ISNS and FAULT
+between boards on a moving vehicle: the family latches, is mechanically keyed so it cannot
+be seated backwards or in the wrong socket, and is rated well past anything on those pins.
+Single-row rather than the more common 2×N because the dual-row variants would have meant
+re-drawing both symbols with a different pin order and re-verifying the netlist — real work
+in exchange for a slightly smaller footprint on a board that is not space-constrained.
+Horizontal so the harness leaves the board edge rather than standing off the face, which
+matters once a heatsink extrusion is bolted over the power stage.
+
+**These are board-side parts only.** The mating housings and crimp terminals are harness
+items and are not in this project's BOM. They need to be on the harness BOM before anything
+is ordered, or the boards arrive with nothing to plug into them.
+
+### The fuse left the board
+
+F101 was deleted from the BUS sheet. The trigger was checking the physical part rather
+than the symbol: a MIDI-class bolt-down fuse at this current is roughly 48 × 36 × 16 mm on
+M6 studs. That is not a component you place — it is a piece of hardware you mount, and
+putting it on the PCB means the board carries the mechanical load of two M6 joints plus
+whatever the harness does to them.
+
+Moving it into the harness upstream of J101 is better on the engineering merits and not
+just the packaging ones: **a board-mounted fuse does not protect the cable feeding it.** A
+harness fuse at the battery end protects the cable and the board. The board keeps its bus
+entry connector; the protection moves to where the fault energy actually comes from.
+
+Logged as a deliberate scope move, not a deletion — the fuse still exists in the system,
+it is just not this board's part.
+
+### A project footprint library
+
+    ${KIPRJMOD}/lib.pretty    registered in fp-lib-table as `lev_lib`
+
+Registered by project-relative path, not absolute, so the repository is self-contained: a
+clone on another machine resolves the library with no configuration. Anything KiCad does
+not ship lives here rather than in a user-global library that would not travel with the
+project.
+
+### RETRACTION — I told him not to use a correct footprint
+
+The Molex 38969-0002 (bus and coil terminals, J101/J203/J204) is not in KiCad's libraries.
+He found a vendor-generated footprint, and I examined it and told him it was wrong:
+
+    pad 1 at (0.000,  0.000)
+    pad 2 at (12.700, 13.000)
+
+Two through-holes offset in **both** axes — staggered. Mouser's parametric table for the
+part says *Number of Rows: 1*. A single-row connector's pins are collinear. I concluded the
+footprint generator had produced garbage and advised against using it.
+
+I was wrong, and the way I was wrong is the same failure as the LM393 episode on 08-13.
+
+He pushed back — the part is genuinely still sold, and a second, independently generated
+footprint from a different source showed the same staggered geometry. **Two independent
+vendors agreeing should have stopped me immediately.** Instead I kept the conclusion and
+looked for reasons the evidence was bad.
+
+Resolved by parsing the manufacturer's own STEP model — the physical solid, not a table
+about it. The pins are at:
+
+    (-6.350, -6.502)  and  (+6.350, +6.502)      ΔX = 12.700   ΔZ = 13.004
+
+Staggered, exactly as both footprints drew them, to within 4 µm of the footprint's 13.000.
+The footprints were right. My reading of the spec table was wrong: **"Number of Rows"
+describes terminal rows in the housing, not hole rows in the PCB.** A single-row connector
+can absolutely have staggered PCB pins — the stagger is a retention feature, it stops the
+part rocking out under vibration, which is precisely why you would pick this family for a
+pod.
+
+The lesson is the same one, restated: *a spec table is a summary written by a person; a
+STEP model and a land pattern are the geometry itself.* When a summary and two independent
+pieces of geometry disagree, the summary loses. I had this lesson written down already
+(08-13, "constraints before evidence") and did not apply it. Writing a rule down is not the
+same as having it.
+
+The cost of this one was low — an hour and some doubt — but the failure mode is expensive:
+had he taken my advice, he would have hand-drawn a replacement footprint for a part whose
+correct footprint he already had, and hand-drawn footprints are exactly where mechanical
+errors come from.
+
+### Choosing between the two candidate footprints
+
+Both were correct on pin positions. They differed on copper:
+
+| | first candidate | SamacSys (chosen) |
+|---|---|---|
+| Pad diameter | 4.4704 mm | **5.940 mm** |
+| Drill | 3.96 mm | 3.96 mm |
+| Annular ring | 0.25 mm | **0.99 mm** |
+| 3D model | none | 38969-0002.stp |
+
+At the same drill, the annular ring is the whole difference, and 0.25 mm is thin for a
+terminal that carries the full bus current and takes mechanical load from a ring lug being
+torqued down. 0.99 mm gives four times the copper around the barrel to conduct through and
+to resist pad lift. The 3D model is a second, independent reason: it is what let this
+retraction be settled by geometry instead of argument, and it will do the same job again
+during mechanical fit-check against the heatsink.
+
+### Verification
+
+**Update PCB from Schematic (F8): 0 errors, 0 warnings, 156 footprints.** Zero missing.
+
+Both channel instances produced identical footprint sets, which is the check that matters
+for a multi-instance sheet — if one instance had picked up a stale assignment, the two
+would diverge:
+
+    CH1   D1/D3 SMA · D2 SMC · D4–D7 SOD-123 · R11 WSK2512
+    CH2   D208/D209 SMA · D205 SMC · D203/204/206/207 SOD-123 · R219 WSK2512
+
+**The schematic phase is closed.**
+
+### What the board needs before placement can start
+
+Three mechanical inputs, none of which are engineering decisions I can make from here:
+
+1. **Board outline** — dimensions and the envelope it has to live in.
+2. **Mounting holes** — positions, diameter, and whether any are electrically bonded.
+3. **Heatsink** — the extrusion's part number or profile, and how it mounts, because
+   ~1.35 °C/W is a substantial piece of metal and its geometry decides where the row of
+   eight TO-220s can physically go. Everything else on the board places around them.
+4. **Harness entry edge** — which side the bus and coil cables come in from, which sets
+   where J101/J203/J204 go and therefore where the high-current pours run.
+
+Placement order once those exist: outline → the eight TO-220s against the heatsink edge →
+local 1 µF ceramics at each bridge → IR2184s within ~15 mm of their FETs → shunt and
+INA240 with SNS_P/SNS_N routed as a tight pair → J203/J204 → J101 and the bulk cans →
+J201/J202 and the logic.
+
+### Still open, unchanged
+
+- Coil L, k and R remain unmeasured. A1 stays an accepted assumption by the lead's
+  decision, not a measurement.
+- The bus-fault detector of §3.2 is still undesigned; OCP remains hard-off for rev 0.
+- Micro-Fit mating housings and crimp terminals need to be added to the harness BOM.
+
+---
+
+## 2026-08-14 (later still) — mechanical baseline fixed by decision; the 4-yoke question answered
+
+### First: yes, four yokes. This board is half the pod on purpose.
+
+Sebastian asked whether I knew the pod has four yokes, having noticed this board only
+drives two. It does, and the two-channel count is a decision from Day 1, not an oversight —
+`04_board_partitioning.md` §4 recommends **two identical 2-channel boards**, and §2.1
+gives the reason: bus current is set by yoke current × channel count and is independent of
+topology.
+
+    4 channels × 30 A/yoke  →  120 A into one board   ≈ 48–73 mm of uninterrupted 2 oz copper
+    2 channels × 30 A/yoke  →   60 A into one board   comfortable
+
+120 A is a genuinely hard PCB problem on a board where the connectors and bulk caps
+interrupt the pour anyway. Secondary reasons, all still holding: 8 TO-220s bolted to a
+common heatsink instead of 16 (§3.1); a layout error costs a small re-spin instead of
+taking the pod down (§3.2); one spare covers either position (§3.3); and the two boards are
+one layout, so it is one design either way.
+
+Explicitly **not** inherited: the overview document's fault-tolerance argument (a lost
+diagonal keeps support balanced). That premise is still unverified — Q16, "is the pod
+controllable on two yokes at all", was never answered. The two-board case stands without
+it.
+
+**What this does open, though, is the PDU question, and Sebastian's observation is the
+right trigger for it.** Two boards means something upstream has to split the pack and fuse
+it. `04_board_partitioning.md` §5 is unambiguous about the answer: **buy it, don't build
+it.** Designing a 120 A PCB is the hardest problem in the project and a solved commercial
+one. Two live cautions carried forward from that section:
+
+- Most marine/automotive distribution blocks are rated **≤48 V DC**. This bus is 60 V.
+- Standard ANL and MIDI bolt-down fuses are commonly rated **32 V DC** — invalid here. The
+  Victron MEGA-fuse has an **80 V DC** variant. DC interrupting capacity does not
+  extrapolate upward from a lower-voltage part; check it, don't assume it.
+
+This also means the harness fuse decided earlier today is per-board, downstream of whatever
+distribution block gets bought.
+
+### Mechanical baseline — decided, because nobody upstream is deciding
+
+Asked for board outline, mounting and heatsink, Sebastian's answer was that he gets to
+choose and has no constraint driving it. Rather than leave placement blocked on an input
+that does not exist, the following is **fixed by decision** and logged as assumptions
+A10–A13 in `09_design_sheet_rev0.md` §2, each with its change cost. If a real mechanical
+constraint appears later, these are the four things to re-open.
+
+**Outline: 160 × 100 mm (Eurocard).**
+
+Not arbitrary. Eight TO-220s at a realistic ~15 mm pitch need ~120 mm of board edge, and
+§4.2 of the design sheet already sized the heatsink at *roughly 150 × 100 mm with 40 mm
+fins*. The 160 mm edge and the extrusion are the same dimension — the board is as long as
+the thing that cools it. Eurocard is also a standard every fab prices normally, and
+standoffs, card guides and enclosures for it exist off the shelf.
+
+**Mounting: 4 × M3, holes 3.2 mm, on a 150 × 90 mm rectangle** (5 mm in from each edge).
+Plated, 6.5 mm copper keepout, 7 mm component keepout for a washer and the hex of a
+standoff.
+
+**All four holes isolated from every net** — with one deliberate provision: a 0 Ω 1206
+jumper footprint between the hole nearest the bus entry and GND, unstuffed by default.
+
+That last part is the only real engineering content in the mechanical set. The yokes float
+today; `03_open_questions.md` records the lev team saying the only common point is at the
+motor-controller negatives. Bonding this board's ground to chassis through a mounting screw
+would create a second, unplanned return path for 60 A of switching current — through the
+pod structure. So: isolated by default, bondable by stuffing one part, and no re-spin
+either way. A decision that can be reversed with a soldering iron does not need to be
+right today.
+
+**Heatsink: extrusion bolted along one 160 mm edge**, TO-220 tabs vertical against the fin
+base, M3 through each tab into a tapped hole in the extrusion. Every device gets an
+insulating pad — Q1/Q3 tabs sit at +60 V and Q2/Q4 tabs at the switch nodes, so the eight
+tabs on this board are at **five different potentials** and none of them may touch the metal.
+The 1.5 °C/W silpad is already in the §4.2 budget.
+
+No specific extrusion part number yet. 1.35 °C/W in natural convection is a substantial
+piece of metal, and A6 (40 °C ambient) and airflow (Q20) both move it — that is a part to
+select against a real datasheet, not to guess at.
+
+**Harness entry: power on the short edges, logic on the far long edge.**
+
+    ┌──────────── heatsink extrusion, 160 mm ────────────┐
+    │              Q1–Q4  ·  Q201–Q204                    │
+    J101                                          J203/J204
+    (bus in)        bulk caps · gate drive        (coils out)
+    │        IR2184 · INA240 · LM393 · 74HC74             │
+    └──── J201 (4-way rails) · J202 (12-way logic) ───────┘
+
+This falls out of the current path rather than being chosen: bus in → bulk → bridge → shunt
+→ coils out is a straight line if the power connectors sit on the two short edges next to
+the FET row. Logic goes on the opposite long edge, as far from the switching node and the
+commutation loop as a 100 mm board allows.
+
+### Status
+
+Placement is no longer blocked. The remaining genuine unknowns — coil L/k/R, the §3.2 bus
+fault detector, Q16 — none of them gate laying this board out.
+
+---
+
+## 2026-08-14 (end of day) — adversarial review of the whole schematic
+
+Full write-up: `16_adversarial_review.md`. Log entry records the method and the lessons.
+
+### Method
+
+Five independent reviewers, each given **only** the extracted netlist and the operating
+point — deliberately not the design documents, so nobody could be anchored by my own
+rationale. Each was told to break the design rather than confirm it, and each was told that
+a false positive costs real trust, so anything they checked and found sound had to be listed
+as checked-and-OK rather than quietly dropped. Dimensions: power stage and thermals; gate
+drive; current sense and OCP; the logic-level boundary at J202; system failure modes.
+
+Then a sixth pass whose only job was to **refute**. Nine contested claims went to it — ones
+where reviewers contradicted each other, or contradicted a part's own marketing copy.
+
+That last pass earned its place. It killed two findings outright and **inverted one
+recommended fix**: a reviewer had proposed moving the 74LVC2G17 buffers from +3.3 V to +5 V
+as a "free" cure for a thin IR2184 VIH margin. The IR2184's Recommended Operating Conditions
+cap the logic inputs at VSS + 4 V, so that change would have taken a compliant 3.3 V drive
+and put it *at* the absolute maximum. Had I passed the review through unverified, I would
+have handed over a fix that made the board worse — and it would have looked authoritative,
+because it came with a datasheet citation attached to the front-page marketing bullet
+instead of to the ratings table.
+
+**That is the lesson of the day, and it is the same one as the staggered-pin retraction this
+morning, running in the opposite direction.** This morning I trusted a spec-table summary
+over two pieces of real geometry. This afternoon a reviewer trusted a marketing bullet over
+the ratings table. Both failures are "read the summary, skip the table."
+
+### What came out
+
+Nineteen surviving findings. Seven are pre-layout because they add or change parts. The
+headline four:
+
+1. **The fault latch is not set-dominant, and the annotation on the sheet says it is.** A
+   74HC74 with `/S` and `/R` both asserted gives Q = H *and* /Q = H — and /Q is the SD net.
+   So asserting RESET while a fault is live sets SD **high** and re-enables the bridge into
+   the overcurrent. Four of the five reviewers found this independently. It fires on the most
+   obvious firmware retry loop there is, and on every power-up while the POR RC holds RESET
+   low.
+2. **RESET is the only logic line with no level translation.** 74HC74 VIH at a 5 V rail is
+   3.5 V; the node sits at 3.33 V. Every PWM line got a Schmitt buffer and this one got a
+   100 Ω resistor. Fix is a 74HCT74 — one BOM line.
+3. **"PWM low" is not "off".** From the IR2184's own VIL row — *"logic '0' input voltage for
+   HO & logic '1' for LO"* — a pulled-down input turns the **low side on**. So the pulldowns
+   give a defined state, not a safe one, and a single backed-out PWM pin gives ~30 A of
+   uncommanded DC current, below the 45 A trip, with the telemetry reading normal. Worse:
+   tracing the netlist, **the MCU has no path to command shutdown at all** — SD is driven
+   only by the latch, and RESET only clears it.
+4. **The capacitor bank is sized for one modulation scheme and the thermals for another.**
+   This one is mine. `09_design_sheet_rev0.md` §4.1 sizes the FET losses under "Antiphase
+   (design to this)"; `13_schematic_review_power_channel.md` §3.1 sizes the bank on 15 A RMS
+   per channel, which is the **sign-magnitude** number. Locked antiphase in phase is 52 A.
+   Six cans give 8–14 A. They only work for sign-magnitude interleaved 180°.
+
+   The two documents were written a day apart, each internally consistent, and the
+   contradiction lived in the gap between them. Nothing in ERC, F8 or the netlist
+   cross-check can see a fault of that shape — every one of those tools checks the drawing
+   against itself.
+
+### Three more corrections to my own record
+
+- `14_power_channel_closeout.md` §3 said a 16 mm can at 470 µF/100 V "is unusual." Backwards:
+  Ø16 is the *only* size that value exists in, across Nichicon UPW, Nichicon UVR, Rubycon ZLH
+  and Panasonic FR-A. **The Ø18 footprint now on C101–C106 has no part to put in it.**
+- The design sheet specified the shunt as "1 mΩ, 4-terminal, ≥2 W." The WSK2512 actually
+  fitted is **1.0 W at 70 °C** — half the stated requirement, running at 90 % of rating at
+  the design current. The fix that costs nothing elsewhere is 0.5 mΩ + INA240A2 (gain 50):
+  same 20 mV/A, same thresholds, same footprint, 45 % of rating.
+- Today's earlier entry said the TO-220 tabs sit at six different potentials. Five. Fixed in
+  place above.
+
+### The pattern worth keeping
+
+Every one of the four headline findings is a **boundary** failure — between two chips'
+logic levels, between the latch and the thing resetting it, between the MCU's model of the
+board and the board's actual default state, between two documents written on different days.
+
+None of them is visible in a netlist, because a netlist says what is connected, not what the
+connection *means*. ERC is clean, F8 is clean, and the independent netlist reconstruction
+matched pin for pin — and all four of these were sitting there the whole time. Worth
+remembering the next time a clean toolchain feels like an answer.
+
+### Status
+
+Schematic is **re-opened**, not closed. Seven pre-layout changes, one modulation decision,
+and two questions for other people (electronics-bay pressure; whether the slow-decay circuit
+gets built for rev 0). Placement waits on those.
