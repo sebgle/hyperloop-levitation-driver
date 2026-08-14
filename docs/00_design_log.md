@@ -34,6 +34,8 @@ and why — including the things that turned out to be wrong.
 ---
 - `16_adversarial_review.md` — hostile review of the full schematic, 19 findings, datasheet-verified
 - `17_rev0_fix_plan.md` — the executable fix list: 7 blocks, ~19 new parts, ~3 hours
+- `18_firmware_interface.md` — MCU-side contract: pinout, EN, OK polarity, scaling, sequences
+- `19_bom_caveats.md` — where the symbol name is NOT the part to order
 
 
 ## 2026-08-11 · Day 1
@@ -1344,3 +1346,78 @@ which is the argument for keeping two independent views of the same file.
   down.
 - Findings 13–16 and 18–19 from the review, deferred by plan.
 - Commit, then placement.
+
+---
+
+## 2026-08-14 (night) — delta review, and four defects of my own making
+
+Ran a second adversarial review, scoped to the ~25 parts changed today rather than the whole
+board. It found five problems. **Four of the five were caused by this morning's fixes.**
+
+That number is the point of the entry. At the moment those four defects were introduced, ERC
+was clean, F8 was clean, and an independent netlist reconstruction matched pin for pin. Every
+signal the toolchain can produce said the board was fine.
+
+| | Defect | Whose |
+|---|---|---|
+| D1 | Board powers up **latched off** — the threshold bypass caps ramp at τ = 841 µs, the POR released at 511 µs, and the latch captured a fault that never existed | mine |
+| D2 | Moving VTH_HI to 2.776 V put **both** comparator inputs over the LM2903B's common-mode ceiling at the decision point | mine |
+| D3 | The +3.3 V blocking diode moved the trip point from 45.0 A to **39.6 A** and pushed the INA240 under its minimum supply | mine |
+| D4 | The /SD divider landed at **2.75 V against a 2.70 V threshold** | mine |
+| D5 | RESET's 1 ms edge violates the 74HCT00's input transition-rate limit by 2000× | pre-existing, worsened by mine |
+
+Fixes: C22/C224 → 1 µF · U4 to +12 V · D210 deleted · R26/R19 → 1 k/3.3 k · U6 → 74HCT132.
+Re-verified: ERC 0 errors, F8 0/0 at 180 footprints, cross-check **exact on 99 nets, 492
+pads**.
+
+### The one I got wrong twice
+
+I told him the trip point was ratiometric — that using the same 3.3 V rail for the INA240's
+reference and the threshold divider made rail error cancel. It doesn't. Working it out
+properly:
+
+    I_trip = (VTH_HI − V_rail/2) / (G·R_shunt) = 13.65 × V_rail
+
+The trip current is **linear in the rail**, not immune to it. What ratiometric buys you is
+that the *MCU's* reading is rail-independent when the ADC shares the reference — a different
+and much narrower claim. So the 0.4 V I added with a blocking diode cost 12 % of the trip
+threshold.
+
+I asserted that twice in writing before doing the algebra. The check that would have caught
+it is trivial and I skipped it because "ratiometric" is a word that sounds like it settles
+the question.
+
+### The one where my premise was inverted and the conclusion survived anyway
+
+I flagged the LM2903B common-mode range as a suspected problem, reasoning that both
+comparator inputs must sit inside it. The datasheet says the opposite — only *one* input has
+to be in range. So the stated premise was wrong.
+
+The finding survived for a different reason: **at the decision point both inputs are at
+VTH_HI by definition**, so when the threshold itself exceeds the ceiling, the "one valid
+input" allowance does not help. Right answer, wrong reasoning, and I would not have found the
+right reasoning without the reviewer correcting the premise first.
+
+Worth recording because the failure mode is subtle: a correct conclusion reached by a wrong
+argument is not a verified finding, and it would have been very easy to accept the reviewer's
+"REFUTED" and drop a real defect.
+
+### Three symbol/value mismatches now exist
+
+The library lacks LM2903B, 74HCT132 and a Ø16 470 µF/100 V footprint, so the schematic uses
+near-equivalents with the true part in the Value and MPN fields. One of these is dangerous if
+ignored: fitting an actual **74LS132** would put −0.4 mA through the 10 kΩ EN pulldown, which
+cannot hold it, so **EN would float high and the whole MCU interlock would be decorative**.
+
+Collected in `19_bom_caveats.md` so there is one place that says "the symbol name is not the
+part number, and here is what happens if you order the symbol."
+
+### Where this leaves the schematic
+
+Closed again, with more evidence behind it than this morning. Two review passes, the second
+of which found that the first pass's own fixes were the largest source of new defects. The
+process that keeps working is not "review carefully once" — it is **review after every
+substantive change, and check the reviewer**.
+
+Open: findings 13–16 and 18–19 from the main review, the §4.1 thermal re-derivation under
+unipolar PWM, and coil L/k/R still unmeasured. None block placement.

@@ -501,3 +501,34 @@ TI INA240 · TI LM393 · Vishay WSK2512 and WSLP2512 · Vishay ES1D and SS34 ·
 Littelfuse 5.0SMDJ · Nichicon UPW and UVR · Rubycon ZLH · United Chemi-Con KY ·
 Vishay CRCW e3 · Bergquist Sil-Pad 400 / 2000 / K-10 · Molex 38969-0002 ·
 STMicroelectronics STM32F407 and STM32G474.
+
+
+---
+
+# ADDENDUM — delta review, 2026-08-14 evening
+
+After blocks 1–6 of `17_rev0_fix_plan.md` were built, a second adversarial review was run
+**scoped to the ~25 changed parts only**. It found five more problems. **Four of the five were
+caused by the fixes in this document.** All five are now fixed; recorded here so the
+superseded advice is not followed again.
+
+| # | Problem | Cause | Fix applied |
+|---|---|---|---|
+| D1 | Board powered up **latched off**. C25/C26 (added by §11) ramp the thresholds with τ = 841 µs while ISNS settles instantly, so FAULT_N is low until 759 µs — but the POR released RESET at 511 µs, so the latch captured a fault that never existed | §11 of this document | C22/C224 100 nF → **1 µF**, giving the POR a 10 ms constant that outlasts the thresholds |
+| D2 | Comparator common-mode ceiling exceeded. Moving VTH_HI from 2.55 V to 2.776 V (§7) put **both** comparator inputs above the LM2903B's (V+ − 2.0 V) = 2.65 V limit at the decision point, once D202's drop on +5 V is counted | §7 of this document | U4/U204 V+ moved **+5 V → +12 V**. Ceiling becomes 10 V. Outputs are open-drain and still pull to +5 V, so nothing downstream changed |
+| D3 | **The trip point is not ratiometric.** This document asserted rail error cancels. It does not — trip current is *linear* in the 3.3 V rail. D210 (§4) dropped that rail 0.4 V, moving the trip from 45.0 A to **39.6 A** and pushing the INA240 below its 2.7 V minimum supply at the cold, low-rail corner | §4 of this document | **D210 deleted**, C233 kept as bulk. R24/R25 already cover the floating-driver-input hazard the hold-up was protecting |
+| D4 | /SD divider marginal: R26/R19 at 3k3/10k gave **2.75 V against a 2.70 V V_IH** at the realistic worst case, once D202's drop is counted | §10 of this document | R26 → **1 k**, R19 → **3.3 k**. 2.86 V guaranteed-worst, 3.72 V at the high end vs a 4.0 V limit |
+| D5 | RESET's 1 ms RC violates the 74HCT00's input transition-rate limit (139 ns/V) by **2000×**, and today's change routed it through two cascaded linear-region gates | pre-existing, worsened by §1 | U6/U208 → **74HCT132** (Schmitt inputs, identical pinout). Also protects the EN and FAULT_N inputs |
+
+**Verification after the fixes:** ERC 0 errors / 2 intentional warnings; F8 0/0 with 180
+footprints; independent netlist cross-check **exact on all 99 nets, 492 pads**.
+
+**The lesson worth keeping.** This document's own fixes introduced four new defects, in a
+delta of 25 parts, on a design whose ERC, F8 and netlist cross-check were all clean at the
+moment they were introduced. Reviewing after every substantive change is not
+belt-and-braces — it is the only thing that caught these.
+
+Superseded recommendations in the body above: **§4** (the +3.3 V blocking diode — removed),
+**§7** (the claim that the divider needs no other change — R15 does move, and the ratiometric
+claim was wrong), **§10** (the 3k3/10k divider values), and **§5** (sign-magnitude — superseded
+by unipolar 3-level PWM, see A14 in `09_design_sheet_rev0.md`).

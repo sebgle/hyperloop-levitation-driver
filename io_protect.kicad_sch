@@ -2817,7 +2817,7 @@
 	)
 	(wire
 		(pts
-			(xy 214.63 186.69) (xy 218.44 186.69)
+			(xy 214.63 186.69) (xy 280.67 186.69)
 		)
 		(stroke
 			(width 0)
@@ -3044,16 +3044,6 @@
 			(type default)
 		)
 		(uuid "76ab5aed-bdfa-429d-9ad0-7b801f38ce08")
-	)
-	(wire
-		(pts
-			(xy 226.06 186.69) (xy 280.67 186.69)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "77eb670a-60db-40b4-be68-33306974408a")
 	)
 	(wire
 		(pts
@@ -3584,16 +3574,6 @@
 			(justify left bottom)
 		)
 		(uuid "809cce1f-254b-43ca-97b4-499f05fc2fa2")
-	)
-	(label "+3V3_IN"
-		(at 214.63 186.69 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "84d8f69b-5b30-44a3-9b28-6b46b05dc25f")
 	)
 	(label "ISNS2_OUT"
 		(at 77.47 71.12 0)
@@ -4311,85 +4291,6 @@
 			(project "final_lev"
 				(path "/0a40c0f2-6b4c-4590-a920-c8cc820982d1/162916c8-3b57-4d49-9968-83d99e03257d"
 					(reference "C210")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:D_Schottky")
-		(at 222.25 186.69 180)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "1b6f08cc-8664-42f7-9a86-f7ab44b6a8e6")
-		(property "Reference" "D210"
-			(at 222.25 190.246 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "SS34"
-			(at 222.25 192.786 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Diode_SMD:D_SMA_Handsoldering"
-			(at 222.25 186.69 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 222.25 186.69 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Schottky diode"
-			(at 222.25 186.69 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "2"
-			(uuid "b0b9128f-3aa0-4611-8799-54412c528501")
-		)
-		(pin "1"
-			(uuid "3e481cca-66fd-42ef-814c-4ce4649b0a5d")
-		)
-		(instances
-			(project "final_lev"
-				(path "/0a40c0f2-6b4c-4590-a920-c8cc820982d1/162916c8-3b57-4d49-9968-83d99e03257d"
-					(reference "D210")
 					(unit 1)
 				)
 			)
