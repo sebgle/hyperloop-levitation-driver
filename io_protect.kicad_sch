@@ -3652,7 +3652,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "lev_lib:389690002"
 			(at 290.83 118.11 0)
 			(hide yes)
 			(show_name no)
@@ -5861,7 +5861,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_Molex:Molex_Micro-Fit_3.0_43650-0400_1x04_P3.00mm_Horizontal"
 			(at 204.47 179.07 0)
 			(hide yes)
 			(show_name no)
@@ -5884,6 +5884,17 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 204.47 179.07 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "43650-0400"
 			(at 204.47 179.07 0)
 			(hide yes)
 			(show_name no)
@@ -6623,7 +6634,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "lev_lib:389690002"
 			(at 290.83 105.41 0)
 			(hide yes)
 			(show_name no)
@@ -6793,7 +6804,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_Molex:Molex_Micro-Fit_3.0_43650-1200_1x12_P3.00mm_Horizontal"
 			(at 69.85 63.5 0)
 			(hide yes)
 			(show_name no)
@@ -6816,6 +6827,17 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x12, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 69.85 63.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "43650-1200"
 			(at 69.85 63.5 0)
 			(hide yes)
 			(show_name no)

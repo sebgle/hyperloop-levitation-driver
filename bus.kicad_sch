@@ -348,158 +348,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:Fuse"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "F"
-				(at 2.032 0 90)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "Fuse"
-				(at -1.905 0 90)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at -1.778 0 90)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Fuse"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "fuse"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "*Fuse*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "Fuse_0_1"
-				(rectangle
-					(start -0.762 -2.54)
-					(end 0.762 2.54)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 2.54) (xy 0 -2.54)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "Fuse_1_1"
-				(pin passive line
-					(at 0 3.81 270)
-					(length 1.27)
-					(name ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -3.81 90)
-					(length 1.27)
-					(name ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Device:R"
 			(pin_numbers
 				(hide yes)
@@ -1010,9 +858,9 @@
 			(embedded_fonts no)
 		)
 	)
-	(text "BUS ENTRY + FUSING\nF101 protects everything downstream. It is NOT the over-current\nprotection - that is the ±45 A comparator on each power_channel.\nThis clears shorted-FET and shorted-bus faults, where current is\nlimited only by battery impedance.\n70 A: bus draw is coil current × duty ≈ 30 A average per board with\n60 A peaks. MIDI HP series is 70 VDC rated; most automotive fuses\nare 32 V and would be wrong here."
+	(text "BUS FUSING - NOT ON THIS BOARD\nThe 60 V bus fuse is mounted in the harness at the battery:\n70 A Littelfuse MIDI HP, 70 VDC rated, 2500 A interrupting.\nMost automotive fuses are 32 V and are NOT acceptable here.\nIt protects the battery cable as well as this board. There is no\nfuse between J101 and the bridges - everything downstream of J101\ndepends on it."
 		(exclude_from_sim no)
-		(at 69.088 64.516 0)
+		(at 66.04 69.596 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1208,16 +1056,6 @@
 	)
 	(wire
 		(pts
-			(xy 67.31 83.82) (xy 76.2 83.82)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "73c6a92f-58c4-4fde-b9fd-5f31947de775")
-	)
-	(wire
-		(pts
 			(xy 152.4 91.44) (xy 160.02 91.44)
 		)
 		(stroke
@@ -1308,7 +1146,7 @@
 	)
 	(wire
 		(pts
-			(xy 53.34 83.82) (xy 59.69 83.82)
+			(xy 53.34 83.82) (xy 76.2 83.82)
 		)
 		(stroke
 			(width 0)
@@ -1335,16 +1173,6 @@
 			(type default)
 		)
 		(uuid "f87a709f-3220-4de6-9537-bb8df3ab351e")
-	)
-	(label "VBATT"
-		(at 53.34 83.82 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "2fb4c2f7-784e-4863-9fba-b6cf55a5e3a6")
 	)
 	(symbol
 		(lib_id "Device:C_Polarized")
@@ -1473,7 +1301,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "lev_lib:389690002"
 			(at 48.26 86.36 0)
 			(hide yes)
 			(show_name no)
@@ -1506,7 +1334,7 @@
 				)
 			)
 		)
-		(property "MPN" "Molex 38969-0002"
+		(property "MPN" "38969-0002"
 			(at 48.26 86.36 0)
 			(hide yes)
 			(show_name no)
@@ -2293,86 +2121,6 @@
 			(project "final_lev"
 				(path "/0a40c0f2-6b4c-4590-a920-c8cc820982d1/ad4a7ac2-7247-48cc-af34-a682db78e613"
 					(reference "#FLG0101")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:Fuse")
-		(at 63.5 83.82 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "ea831e63-a933-4b02-a973-5a6d3e97b7e2")
-		(property "Reference" "F101"
-			(at 63.5 77.47 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "70A"
-			(at 63.5 80.01 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 63.5 85.598 90)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 63.5 83.82 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Fuse"
-			(at 63.5 83.82 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "87adf0d5-cb88-4f62-ac91-debeccad0270")
-		)
-		(pin "2"
-			(uuid "c68844a8-fba6-4f6d-a3d8-0d5b67e37576")
-		)
-		(instances
-			(project "final_lev"
-				(path "/0a40c0f2-6b4c-4590-a920-c8cc820982d1/ad4a7ac2-7247-48cc-af34-a682db78e613"
-					(reference "F101")
 					(unit 1)
 				)
 			)

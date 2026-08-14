@@ -751,3 +751,141 @@ and copper 0.035 → 0.07 mm (2 oz — the board is not buildable at 1 oz).
 
 ---
 *Log continues.*
+
+---
+
+## 2026-08-14 — BUS, IO_PROTECT, root wiring. Schematic complete.
+
+The remaining three sheets and the root are done. **84 nets, 156 components, ERC 0 errors
+and 1 accepted warning, netlist verified against an independent reconstruction.**
+
+### BUS — power entry
+
+Battery in on J101 (Molex 38969-0002, now approved by the lead), six 470 µF bulk
+electrolytics, 22 k bleed, PWR_FLAGs on +60V and GND.
+
+Two things worth recording. The bulk bank is **sized by ripple-current rating, not
+capacitance** — ~20 A RMS on the shared bus once the two channels interleave 180°, so the
+part count follows whatever ripple rating the chosen capacitor has rather than a target
+microfarad number. And the bleed resistor was re-derived after the bank grew: 22 k against
+2820 µF is τ = 62 s, so 60 V → under 10 V in ~110 s, not the ~40 s implied when the bank
+was two capacitors. 5.1 J stored.
+
+### The fuse is now a harness item, not a board part
+
+Originally drawn as F101 on this sheet. Reversed after pulling the actual mechanical data:
+the MIDI HP is a **bolt-down chassis component** — roughly 48 × 36 × 16 mm on M6 studs —
+designed to bolt to a bus bar, not to FR4.
+
+On-board it would have cost ~50 × 40 mm plus socket access at the battery entry, put M6
+clamp load onto a 1.6 mm board through thermal cycling, and carried 60 A across a bolted
+joint instead of a soldered one. In the harness it costs nothing, is what the part is for,
+and **also protects the battery cable** — which a board-mounted fuse never could. A chafe
+upstream of J101 is invisible to an on-board fuse.
+
+Requirement recorded on the sheet as a text block, because it now lives outside this
+board's boundary: **70 A Littelfuse MIDI HP, 70 VDC, 2500 A interrupting, mounted at the
+battery.** Most automotive fuses are 32 V and are not acceptable. The note also states
+explicitly that nothing fuses J101 locally, so no one reading BUS in isolation can
+conclude the board is unprotected.
+
+### IO_PROTECT — board I/O
+
+Four connectors (rails in, 12-way control, two yoke outputs), PWM input buffering, output
+conditioning, rail entry protection.
+
+**Buffer choice — 74LVC2G17 at 3.3 V, and the reason is not the obvious one.** The library
+had no HCT part, and 74HC7014 at 5 V needs 0.7 × VCC = 3.5 V to register a high, which a
+3.3 V MCU cannot produce — that would have silently reintroduced assumption A4. LVC's
+inputs accept up to 5.5 V *regardless of VCC* (verified on the SN74LVC2G17 datasheet), so
+powered from 3.3 V it takes a 3.3 V or a 5 V MCU with no assumption either way. Output
+drives the IR2184's 2.7 V VIH with 0.6 V of margin; the datasheet lists 3.3 V drive as a
+supported configuration.
+
+**10 k pulldowns on the four buffer inputs are a safety item.** An unplugged harness leaves
+an LVC input floating, which oscillates. Pulled low, both IR2184 inputs sit low, both low-
+side FETs turn on, and each coil is shorted through Q2/Q4 — slow decay. The safe state is
+the default state whenever nothing is connected.
+
+**RESET is pull-low-only, and this is a firmware constraint invisible from the schematic.**
+The 74HC74 runs from +5 V and needs 3.5 V to release CLR. A 3.3 V MCU driving RESET high
+push-pull would sit at 3.3 V — ambiguous — and the latch could stay permanently cleared,
+losing fault latching entirely. Drive low to clear, then release; the on-board pull-up
+provides the high level. Written onto the sheet.
+
+**ISNS output filtering.** 100 Ω + 100 nF, with the capacitor on the *connector* side of
+the resistor. First drawn with the cap on the amplifier side, which was wrong twice over:
+it hung 100 nF directly on the INA240 output with no isolation resistor (stability), and
+it loaded the very node the window comparators watch. On the connector side the resistor
+isolates the amplifier and the RC gives a 16 kHz filter on the outgoing copy — while the
+comparators tap ISNS upstream on power_channel, so the over-current trip stays fast.
+
+### Rail protection, and a gap it exposed
+
+D201/D202 are series Schottkys on the incoming +12 V and +5 V. Each does two jobs: blocks
+reverse polarity, and **isolates the hold-up capacitor** so it cannot back-feed into a
+collapsing pod rail — which is the job C201 exists for in the first place.
+
++3.3 V deliberately gets none. A 0.35 V drop would cost ~10 % of the current-sense
+full-scale range, and losing 3.3 V **fails safe**: the buffer outputs go low, the IR2184
+inputs go low, the low-side FETs turn on, slow decay.
+
+Working through that rail by rail exposed something. Slow-decay-on-fault needs two things
+true at once:
+
+    12 V alive     → drivers can hold the low-side FETs on     C201 covers this
+    SD held HIGH   → drivers not shut down                     nothing covered this
+
+SD is driven by U5 pin 6 — the 74HC74's Q̄ — **and that chip runs from +5 V**. If the 5 V
+rail dies mid-fault, R19's pulldown drags SD low, the bridge tri-states, and the coil dumps
+into the bus: exactly what §3.2 exists to prevent. The board was half-provisioned — 12 V
+anticipating a feature the 5 V rail equally depends on. Fixed by giving +5 V the same
+treatment: blocking diode plus 220 µF.
+
+Neither is exercised yet — the bus-fault detector §3.2 describes still isn't designed, and
+the OCP path remains hard-off by accepted rev-0 decision. But provisioning half of a
+mechanism is worse than provisioning none, because it looks finished.
+
+### Root — dual instantiation
+
+CH1 and CH2 both point at power_channel.kicad_sch. Thirteen nets joining IO_PROTECT to the
+two channels, drawn as short stubs with matching local labels rather than long wires.
+RESET is the only one-to-many, shared by both channels.
+
+### The #PWR duplicate episode
+
+Annotating with "Keep existing" produced 32 "Duplicate items" errors and KiCad refused a
+full ERC: *schematic is not fully annotated*. All 253 instance-references were assigned —
+the problem was that every `#PWRxx` was identical across CH1 and CH2, because power symbol
+references were already set and "keep existing" kept them. Real components renumbered
+correctly into the gaps the 100/200 blocking had left (CH2 took C211–C231, R210–R232,
+D203–D209, Q201–Q204, U203–U207 with zero collisions).
+
+Fixed by rewriting **only CH2's path references** to #PWR0301–#PWR0332 directly in the
+file, after diffing CH1's full 96-reference list before and after and asserting equality
+before writing. The obvious alternative — KiCad's "Reset existing annotations" — would have
+renumbered all 120-odd real components across the design to fix something cosmetic,
+invalidating the review document, this log and the netlist snapshot.
+
+Worth remembering as a hierarchical-design gotcha: **power symbol references are per
+instance path, and "keep existing" will not make them unique for you.**
+
+### Verification
+
+- **ERC: 0 errors, 1 warning** — the SW_B/COIL_B naming, reported once because both
+  channels share a sheet file.
+- **Netlist cross-check: exact match on all 84 nets, pin for pin**, between KiCad's
+  netlister and a reconstruction built from raw symbol geometry, rotation matrices and
+  hierarchical label resolution across four sheets and two instances.
+- That check found one more bug in my own tooling: PWR_FLAG lives in the `power:` library,
+  so it was being treated as a net-naming symbol and keyed on its Value — welding +60V,
+  +12V, +5V, +3.3V and GND into a single net. A flag is a marker, not a name. Second
+  tooling bug the cross-check has caught, after the mirror-transform error on R8.
+- **All 37 capacitors now carry a Voltage field.** The bus bank had been covered only by a
+  text note, but the note lives on the drawing and the BOM is what people order from.
+
+### Remaining before layout
+
+One custom footprint (Molex 38969-0002, used by J101/J203/J204). J201 and J202 still need
+real parts chosen — pick something KiCad already has footprints for and that count goes to
+zero. Board Setup values and 2 oz copper are done.
