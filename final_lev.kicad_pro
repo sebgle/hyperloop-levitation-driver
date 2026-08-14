@@ -640,6 +640,18 @@
       {
         "netclass": "SENSE",
         "pattern": "*SNS_*"
+      },
+      {
+        "netclass": "HV_POWER",
+        "pattern": "*VBATT*"
+      },
+      {
+        "netclass": "AUX",
+        "pattern": "*+12V_IN*"
+      },
+      {
+        "netclass": "AUX",
+        "pattern": "*+5V_IN*"
       }
     ]
   },
@@ -655,7 +667,7 @@
     "page_layout_descr_file": ""
   },
   "schematic": {
-    "annotate_start_num": 0,
+    "annotate_start_num": 200,
     "annotation": {
       "method": 0,
       "sort_order": 0
@@ -820,7 +832,7 @@
         "uuid": "0a40c0f2-6b4c-4590-a920-c8cc820982d1"
       }
     ],
-    "used_designators": "Q1-8,D1-7,#PWR1-32,R1-23,#FLG1-2,U1-7,C1-23",
+    "used_designators": "Q1-8,Q201-204,D1-7,D201-209,#PWR1-34,#PWR101-107,#PWR201-214,J1,J101-102,J201-204,#FLG1-2,#FLG101-105,#FLG201-203,R1-24,R101,R201-232,U1-7,U201-207,C1-27,C101-112,C201-231,F1,F101",
     "variants": []
   },
   "sheets": [
@@ -830,7 +842,19 @@
     ],
     [
       "caa4a5a4-3670-4710-8301-952cca866c48",
-      "power_channel"
+      "CH1"
+    ],
+    [
+      "ad4a7ac2-7247-48cc-af34-a682db78e613",
+      "BUS"
+    ],
+    [
+      "162916c8-3b57-4d49-9968-83d99e03257d",
+      "IO_PROTECT"
+    ],
+    [
+      "4e830c1e-538f-4dbb-bf01-d2466ce385dd",
+      "CH2"
     ]
   ],
   "text_variables": {},

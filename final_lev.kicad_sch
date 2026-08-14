@@ -3,11 +3,889 @@
 	(generator "eeschema")
 	(generator_version "10.0")
 	(uuid "0a40c0f2-6b4c-4590-a920-c8cc820982d1")
-	(paper "A4")
+	(paper "A3")
 	(lib_symbols)
+	(wire
+		(pts
+			(xy 45.72 130.81) (xy 49.53 130.81)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "08d90d72-e1c8-44af-aa68-12d15e5d2706")
+	)
+	(wire
+		(pts
+			(xy 125.73 156.21) (xy 129.54 156.21)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0b4fbbc2-f793-4c3f-ae61-d2429822ead0")
+	)
+	(wire
+		(pts
+			(xy 45.72 135.89) (xy 49.53 135.89)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "210b07f4-3ecd-4f7e-b24b-bba74d31d4a1")
+	)
+	(wire
+		(pts
+			(xy 77.47 123.19) (xy 80.01 123.19)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2bf1c8e8-c166-41de-a593-7d82aaf489a9")
+	)
+	(wire
+		(pts
+			(xy 45.72 125.73) (xy 49.53 125.73)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2dce2f27-b665-4861-8091-f019a4778761")
+	)
+	(wire
+		(pts
+			(xy 170.18 146.05) (xy 172.72 146.05)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3000f4a1-33ff-4bf9-b56a-5395f99606cf")
+	)
+	(wire
+		(pts
+			(xy 45.72 133.35) (xy 49.53 133.35)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "32a5fe55-c630-451c-8a9f-2de8f3402486")
+	)
+	(wire
+		(pts
+			(xy 170.18 121.92) (xy 172.72 121.92)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "35bcc76b-c8c5-4c5b-9397-8ce7ed8a2f8d")
+	)
+	(wire
+		(pts
+			(xy 77.47 133.35) (xy 80.01 133.35)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "48019709-e400-4539-b203-d185df5808f9")
+	)
+	(wire
+		(pts
+			(xy 170.18 119.38) (xy 172.72 119.38)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "536308e5-3e39-4f25-a734-551e8dde46f5")
+	)
+	(wire
+		(pts
+			(xy 125.73 148.59) (xy 129.54 148.59)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "581cd17b-c46b-430a-8d48-4f87c45b03ab")
+	)
+	(wire
+		(pts
+			(xy 125.73 124.46) (xy 129.54 124.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5e017d19-d45c-4db7-a260-603f19320964")
+	)
+	(wire
+		(pts
+			(xy 125.73 146.05) (xy 129.54 146.05)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7638b967-73a0-4e3a-abf1-46ed891fc68b")
+	)
+	(wire
+		(pts
+			(xy 77.47 130.81) (xy 80.01 130.81)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "78fb0be2-cb64-4376-bc41-781dc789aaa6")
+	)
+	(wire
+		(pts
+			(xy 77.47 125.73) (xy 80.01 125.73)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8ca19892-39a2-46dd-84ff-5b2db326bdd2")
+	)
+	(wire
+		(pts
+			(xy 125.73 129.54) (xy 129.54 129.54)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a321c185-3074-4ff9-96a4-a40fa23fce9c")
+	)
+	(wire
+		(pts
+			(xy 125.73 151.13) (xy 129.54 151.13)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b8ffdd2e-911f-4e51-8b18-35e13072b5f0")
+	)
+	(wire
+		(pts
+			(xy 125.73 119.38) (xy 129.54 119.38)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c1132d46-f90a-4470-b7b0-bdf006458b38")
+	)
+	(wire
+		(pts
+			(xy 125.73 121.92) (xy 129.54 121.92)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c38f2562-d244-4a57-9500-aa50634e9be6")
+	)
+	(wire
+		(pts
+			(xy 45.72 140.97) (xy 49.53 140.97)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c4f07c75-9ffc-4eb7-b1e2-6ad99ecd0544")
+	)
+	(wire
+		(pts
+			(xy 77.47 128.27) (xy 80.01 128.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cb54c055-c82a-4dc7-a0db-42c777ed7fe8")
+	)
+	(wire
+		(pts
+			(xy 125.73 127) (xy 129.54 127)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d841ee78-c0c2-4d49-bada-02970acff1bd")
+	)
+	(wire
+		(pts
+			(xy 45.72 123.19) (xy 49.53 123.19)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d9dbf561-b478-45c5-b976-299c0be7d363")
+	)
+	(wire
+		(pts
+			(xy 45.72 138.43) (xy 49.53 138.43)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e43f9342-c17c-4203-aa30-b7b9cf255c6c")
+	)
+	(wire
+		(pts
+			(xy 45.72 128.27) (xy 49.53 128.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e6ab84ce-603b-493f-a8af-aeae5fc18dc4")
+	)
+	(wire
+		(pts
+			(xy 125.73 153.67) (xy 129.54 153.67)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f1ba4b9c-554b-42d0-93b7-f903ba023d5d")
+	)
+	(wire
+		(pts
+			(xy 170.18 148.59) (xy 172.72 148.59)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f1e0ed20-72cd-4dcf-ba0c-5acfb2123835")
+	)
+	(label "FAULT2"
+		(at 172.72 146.05 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "028882bb-9ece-4136-bf16-ea13e08e9c02")
+	)
+	(label "COIL_A1"
+		(at 125.73 119.38 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "02a9ac95-b963-4d8e-a0df-96b392f0d863")
+	)
+	(label "COIL_A1"
+		(at 45.72 123.19 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "0800d38d-4375-4528-b253-74318f611b54")
+	)
+	(label "COIL_B1"
+		(at 45.72 128.27 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "0890e8ec-604d-4eb0-9cc7-2daada991fd5")
+	)
+	(label "ISNS1"
+		(at 45.72 138.43 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "2370ba0c-1b5f-4742-addc-f768ae1ca872")
+	)
+	(label "PWM_B1"
+		(at 125.73 127 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "4f214d81-1912-4356-8057-d1a9ca0c4d1d")
+	)
+	(label "COIL_B2"
+		(at 125.73 148.59 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "53fb8b48-2f01-4981-942c-05b235a75ff6")
+	)
+	(label "COIL_A2"
+		(at 125.73 146.05 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "586b9558-d74e-419a-abbc-3c80926c83a8")
+	)
+	(label "ISNS2"
+		(at 45.72 140.97 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "5c489368-9563-4e38-a7df-23a69b19cd87")
+	)
+	(label "PWM_A2"
+		(at 125.73 151.13 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "61c30bcb-df2a-471f-accc-b7ce708ace1d")
+	)
+	(label "ISNS1"
+		(at 172.72 121.92 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "664a195a-5e78-4980-9db0-67b611927b0d")
+	)
+	(label "PWM_B1"
+		(at 80.01 128.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "6efcd8a8-7c27-49b2-b166-c604c71318b7")
+	)
+	(label "PWM_A2"
+		(at 80.01 125.73 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "7a0e7809-8c52-4d52-8ab7-6bf8d199a7dd")
+	)
+	(label "PWM_B2"
+		(at 80.01 130.81 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "870dc75a-4f7f-430e-9413-db3287a8ce7e")
+	)
+	(label "RESET"
+		(at 80.01 133.35 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "8a29d01c-2d33-4c71-856e-08f2f85a7e05")
+	)
+	(label "FAULT2"
+		(at 45.72 135.89 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "8b17f088-d975-471f-980b-ba25a90ccbc4")
+	)
+	(label "PWM_A1"
+		(at 125.73 124.46 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "a50a89ba-2df8-43cf-871e-34cc56f4ce08")
+	)
+	(label "PWM_A1"
+		(at 80.01 123.19 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a58bd8d4-1613-41f9-a7df-76fffe6d9869")
+	)
+	(label "PWM_B2"
+		(at 125.73 153.67 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "ae1ab7cf-5a87-4456-86cb-878559e54d6e")
+	)
+	(label "RESET"
+		(at 125.73 129.54 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "b0876a50-fba9-4eda-a99e-86ed6efbe91d")
+	)
+	(label "COIL_B1"
+		(at 125.73 121.92 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "b154c904-bb11-451f-b601-39bc67556b08")
+	)
+	(label "FAULT1"
+		(at 45.72 133.35 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "b4f84509-800e-453a-978a-7ccdf8bf4c30")
+	)
+	(label "COIL_A2"
+		(at 45.72 125.73 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "c2cd5f3b-9eae-498a-852f-87337928edf1")
+	)
+	(label "COIL_B2"
+		(at 45.72 130.81 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "c312dd13-af06-4108-a88e-f348fc6145a2")
+	)
+	(label "RESET"
+		(at 125.73 156.21 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "cec339c9-5fce-43cc-a291-6c03f82d154e")
+	)
+	(label "ISNS2"
+		(at 172.72 148.59 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d9ba764c-e872-4b0d-8ecf-133b3d087a10")
+	)
+	(label "FAULT1"
+		(at 172.72 119.38 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "fb50b9c1-6440-4b2f-871e-ca0aca8d8adb")
+	)
 	(sheet
-		(at 129.54 97.79)
-		(size 25.4 24.13)
+		(at 49.53 120.65)
+		(size 27.94 22.86)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "162916c8-3b57-4d49-9968-83d99e03257d")
+		(property "Sheetname" "IO_PROTECT"
+			(at 49.53 119.9384 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "io_protect.kicad_sch"
+			(at 49.53 144.0946 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "COIL_A1" passive
+			(at 49.53 123.19 180)
+			(uuid "dbfc5fb3-c53b-4fc5-a538-96058cac7dfb")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "COIL_A2" passive
+			(at 49.53 125.73 180)
+			(uuid "8b1d3e54-ac62-4d72-af27-1f209b9dd7f2")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "COIL_B1" passive
+			(at 49.53 128.27 180)
+			(uuid "44bd4b3e-f201-401e-8d0d-744fba90e4c8")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "COIL_B2" passive
+			(at 49.53 130.81 180)
+			(uuid "f6c8199c-4941-4e20-a6a8-45bd928e4c9e")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "FAULT1" input
+			(at 49.53 133.35 180)
+			(uuid "3c43a1a1-ec55-4c69-97e2-d7e6301733e0")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "FAULT2" input
+			(at 49.53 135.89 180)
+			(uuid "498758f6-3022-43d7-ae05-073a8ae46e9c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "ISNS1" input
+			(at 49.53 138.43 180)
+			(uuid "5deca672-68d3-4b18-a64e-6929e082a143")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "ISNS2" input
+			(at 49.53 140.97 180)
+			(uuid "5db4c4eb-8fec-4752-9197-c00a38837ae7")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "PWM_A1" output
+			(at 77.47 123.19 0)
+			(uuid "3d30aec5-fed3-43ad-b888-8617a1b81c3d")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "PWM_A2" output
+			(at 77.47 125.73 0)
+			(uuid "95896e67-f3d1-457b-9b69-60270544fb8a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "PWM_B1" output
+			(at 77.47 128.27 0)
+			(uuid "944cc7ae-1906-4159-a1c5-d93567e04336")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "PWM_B2" output
+			(at 77.47 130.81 0)
+			(uuid "e6d359bf-6d39-42ff-a193-bfffe3eba0f0")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "RESET" output
+			(at 77.47 133.35 0)
+			(uuid "553bcc60-f477-4733-8f02-cbc5a6b1d016")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(instances
+			(project "final_lev"
+				(path "/0a40c0f2-6b4c-4590-a920-c8cc820982d1"
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 129.54 143.51)
+		(size 40.64 19.05)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "4e830c1e-538f-4dbb-bf01-d2466ce385dd")
+		(property "Sheetname" "CH2"
+			(at 129.54 142.7984 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "power_channel.kicad_sch"
+			(at 129.54 163.1446 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "COIL_A" passive
+			(at 129.54 146.05 180)
+			(uuid "13f40663-094e-4e4e-87af-28405fe71a03")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "COIL_B" passive
+			(at 129.54 148.59 180)
+			(uuid "665150e9-b184-403f-b07d-6e2cd3c42cec")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "PWM_A" input
+			(at 129.54 151.13 180)
+			(uuid "83d4bb53-8c2f-4dd5-bb9b-5b733a1e5da6")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "PWM_B" input
+			(at 129.54 153.67 180)
+			(uuid "f3a0cffb-a6e5-4217-8f7b-f2cc218aac11")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "RESET" input
+			(at 129.54 156.21 180)
+			(uuid "87166cb7-64e9-4091-9855-b74d571e79b8")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "FAULT" output
+			(at 170.18 146.05 0)
+			(uuid "843163aa-b662-411b-a2b6-168bd02f9d0c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "ISNS" output
+			(at 170.18 148.59 0)
+			(uuid "7859b314-21ee-4d5f-b76d-4ee632230674")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(instances
+			(project "final_lev"
+				(path "/0a40c0f2-6b4c-4590-a920-c8cc820982d1"
+					(page "5")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 201.93 124.46)
+		(size 38.1 19.05)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "ad4a7ac2-7247-48cc-af34-a682db78e613")
+		(property "Sheetname" "BUS"
+			(at 201.93 123.7484 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "bus.kicad_sch"
+			(at 201.93 144.0946 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "final_lev"
+				(path "/0a40c0f2-6b4c-4590-a920-c8cc820982d1"
+					(page "3")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 129.54 116.84)
+		(size 40.64 19.05)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -20,8 +898,8 @@
 			(color 0 0 0 0)
 		)
 		(uuid "caa4a5a4-3670-4710-8301-952cca866c48")
-		(property "Sheetname" "power_channel"
-			(at 129.54 97.0784 0)
+		(property "Sheetname" "CH1"
+			(at 129.54 116.1284 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -32,7 +910,7 @@
 			)
 		)
 		(property "Sheetfile" "power_channel.kicad_sch"
-			(at 129.54 122.936 0)
+			(at 129.54 136.652 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -42,29 +920,9 @@
 				(justify left top)
 			)
 		)
-		(pin "PWM_A" input
-			(at 129.54 106.68 180)
-			(uuid "da4d0c04-7eca-426a-9635-b5423d939895")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(pin "PWM_B" input
-			(at 129.54 102.87 180)
-			(uuid "257faf60-45f9-4aa8-b972-10a486d2a0d7")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
 		(pin "COIL_A" passive
-			(at 129.54 109.22 180)
-			(uuid "9311a23a-cd4c-45b2-a814-5536fe70ad02")
+			(at 129.54 119.38 180)
+			(uuid "f709367f-a374-4a53-888c-fdc2bdf0f27a")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -73,8 +931,8 @@
 			)
 		)
 		(pin "COIL_B" passive
-			(at 129.54 111.76 180)
-			(uuid "9e4408c3-8e0d-4c37-86c7-f5539e36e110")
+			(at 129.54 121.92 180)
+			(uuid "2a012e18-7188-49f3-8fa7-16a0c3ab61ef")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -82,9 +940,9 @@
 				(justify left)
 			)
 		)
-		(pin "ISNS" output
-			(at 129.54 114.3 180)
-			(uuid "1ba9f221-8831-44e0-aa94-e57b27e58ab7")
+		(pin "PWM_A" input
+			(at 129.54 124.46 180)
+			(uuid "cbd3e260-4c18-45f1-ab09-8edd5aeaa037")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -92,9 +950,9 @@
 				(justify left)
 			)
 		)
-		(pin "FAULT" output
-			(at 129.54 116.84 180)
-			(uuid "461371c3-7195-4f80-b190-14256e0b7b78")
+		(pin "PWM_B" input
+			(at 129.54 127 180)
+			(uuid "5ecf3cdf-6a33-4313-a4cc-f33db363aec3")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -103,13 +961,33 @@
 			)
 		)
 		(pin "RESET" input
-			(at 129.54 119.38 180)
-			(uuid "3589db0f-4727-488d-9838-e48e708a1adc")
+			(at 129.54 129.54 180)
+			(uuid "592966f1-a3f1-4273-bc7e-c0ee20f0db17")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
+			)
+		)
+		(pin "FAULT" output
+			(at 170.18 119.38 0)
+			(uuid "c1d695d9-d8fa-4715-88d5-8ccbcdfb26f5")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "ISNS" output
+			(at 170.18 121.92 0)
+			(uuid "9f553e8e-c7eb-458d-8063-2f23426eecaa")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
 			)
 		)
 		(instances
