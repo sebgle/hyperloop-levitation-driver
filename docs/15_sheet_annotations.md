@@ -44,8 +44,10 @@ not inside it.
 BUS DECOUPLING + CLAMP
 8 × 1 µF 1210 + 2 × 100 nF, all ≥100 V X7R, inside the commutation loop.
 Bulk electrolytics are on the BUS sheet, shared between both channels —
-interleaving the two bridges 180° cancels most of the bus ripple, which
-only helps if the bulk is shared.
+interleaving the two bridges 90° cancels almost all of the bus ripple,
+which only helps if the bulk is shared. 90 deg, NOT 180: under unipolar
+PWM the bus draws current twice per carrier period, so a 180 deg shift
+cancels nothing. See A14.
 D2 is a residual clamp (113 V at 44 A), not an energy path. Coil energy is
 handled by slow decay — see FAULT LATCH.
 ```

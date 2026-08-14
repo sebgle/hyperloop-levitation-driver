@@ -1421,3 +1421,54 @@ substantive change, and check the reviewer**.
 
 Open: findings 13–16 and 18–19 from the main review, the §4.1 thermal re-derivation under
 unipolar PWM, and coil L/k/R still unmeasured. None block placement.
+
+---
+
+## 2026-08-14 (late) — third review, and the interleave error
+
+Ran a third adversarial pass, this time over the whole design rather than the delta, on the
+argument that A14 changed the operating point everything else had been analysed against.
+Fourteen findings. The largest was in A14 itself, written six hours earlier.
+
+**The 180° interleave cancels nothing.** Under unipolar PWM the bus draws current only while
+Q1 and Q4 are both on, which happens **twice per carrier period** — so the bus-ripple
+fundamental sits at 2·f_sw and a 180° carrier shift is a full cycle of it. Verified
+numerically:
+
+    D = 0.75    in phase 30.0 A   |   180 deg 30.0 A   |   90 deg 0.1 A
+    bank capability 14.1 A
+
+Under locked antiphase the fundamental *is* at f_sw and 180° genuinely cancels. I carried the
+requirement across when I changed the modulation scheme and never re-derived it. Left in, the
+bank would have run at 2.1× its ripple rating.
+
+Corrected to **90°** in A14, both title blocks, the firmware interface document, and the
+on-sheet annotation text. Historical references in this log are left as written.
+
+**Also actioned:** U5 pin 2 (D) moved from GND to +5 V. With D low, a glitch on the CLK trace
+clocks a zero in and releases SD out of a latched fault. With D high the same glitch commands
+shutdown. One wire, and it changes the failure direction of the whole protection latch.
+
+**Three findings were refuted as artifacts of the review packet, not the schematic** — CH2
+"missing" the parts added earlier, U5's three unused outputs "shorted together", and an
+IR2184 pin transposition. All three came from errors in how I wrote the packet, and all three
+were checked against the raw netlist before being dismissed. Worth noting that a reviewer
+finding a contradiction in the *description* is still useful output, and that a review is only
+as good as the artifact it is given.
+
+### The convergence problem, stated plainly
+
+Findings by round: **19 → 5 → 14**. Roughly 40 % of the third round traces to changes made in
+the first two. The single worst finding exists because I committed a modulation change without
+re-deriving what depended on it — and the switching-loss claim in the same paragraph was wrong
+for the same reason.
+
+That is not a review-quality problem, it is a sequencing problem. Point-fixing a design whose
+foundational input is still unmeasured produces defects faster than review removes them.
+
+**Stopping schematic work here.** The next action is to measure the coil — L, R and k — and
+then re-derive bus ripple, per-device loss, heatsink, bootstrap refresh and OCP timing **in
+one pass, together**, because those are the quantities that keep breaking each other. Then one
+consolidated change set, reviewed once.
+
+Everything in three review documents is a function of numbers nobody has measured.

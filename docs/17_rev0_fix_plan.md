@@ -1,5 +1,10 @@
 # Rev 0 fix plan — exact steps
 
+> **STATUS: blocks 1–6 executed 2026-08-14. This document is a historical record, not live
+> guidance.** Two things in it were later corrected: Block 7 recommends sign-magnitude
+> (superseded by unipolar 3-level, A14) with a **180°** interleave (corrected to **90°**).
+> Current guidance is A14 in `09_design_sheet_rev0.md`.
+
 Companion to `16_adversarial_review.md`. Work through the blocks in order. Save and run ERC
 after each block; do not batch them. Every block is independent, so you can stop after any
 one of them and still have a coherent schematic.

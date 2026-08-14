@@ -176,6 +176,12 @@ while the rail carrying the current reference and the trip thresholds does not.
 
 ## 5. The capacitor bank is sized for a modulation scheme the thermal design does not use
 
+> ⚠️ **SUPERSEDED TWICE.** This section recommends sign-magnitude; A14 in
+> `09_design_sheet_rev0.md` supersedes that with unipolar 3-level PWM. And every "interleaved
+> 180°" figure in the table below is **only valid for the schemes named in that table** — under
+> unipolar the correct angle is **90°**, because the bus-ripple fundamental sits at 2·f_sw.
+> See Addendum 2 at the end of this document. Read A14, not this section.
+
 This one is my error in the earlier documents, and it is worth stating plainly.
 
 `09_design_sheet_rev0.md` §4.1 sizes the FET losses under **"Antiphase (design to this)"**.

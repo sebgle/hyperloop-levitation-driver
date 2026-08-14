@@ -53,7 +53,7 @@ so whatever fraction of the period the bridge draws from the bus, it draws the *
 That fraction is what sets the bus RMS ripple, and it differs by a factor of three across the
 three candidate schemes:
 
-| Scheme | Bus draws for | AC ripple, 1 ch | 2 ch in phase | 2 ch interleaved 180° |
+| Scheme | Bus draws for | AC ripple, 1 ch | 2 ch in phase | 2 ch interleaved (see note) |
 |---|---|---:|---:|---:|
 | Locked antiphase | the whole period, sign-reversing | 25.98 A | **51.96 A** | 30.0 A |
 | Sign-magnitude | D = 0.5 | 15.00 A | 30.0 A | ≈ 0 |
@@ -92,7 +92,7 @@ a clamp or the bank needs more cans — resolve when the coil is measured.
 
 **Cost, stated honestly.** Dead time now distorts both legs rather than one, so there is a
 small duty-dependent error near zero that firmware may need to compensate. That is a
-calibration, not a topology problem. And the 180° interleave has to be real — if both
+calibration, not a topology problem. And the 90° interleave has to be real — if both
 channels share a carrier with no phase offset, the bus ripple doubles to 30 A and the bank is
 marginal again. **The interleave is a hard requirement of this assumption, not an
 optimisation.**

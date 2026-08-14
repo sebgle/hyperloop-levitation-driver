@@ -11,7 +11,7 @@
 		(company "Guadaloop — Power Electronics Subsystem")
 		(comment 1 "60 V battery entry, bulk energy storage, bleed. Fuse is in the harness, not on this board.")
 		(comment 2 "Shared by both power_channel instances.")
-		(comment 3 "Bank sized for unipolar PWM with channels interleaved 180 deg (A14). Locked antiphase needs ~52 A rms and this bank cannot do it.")
+		(comment 3 "Bank sized for unipolar PWM with channels interleaved 90 deg (A14). Locked antiphase needs ~52 A rms and this bank cannot do it.")
 	)
 	(lib_symbols
 		(symbol "Connector_Generic:Conn_01x02"
