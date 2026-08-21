@@ -1472,3 +1472,59 @@ one pass, together**, because those are the quantities that keep breaking each o
 consolidated change set, reviewed once.
 
 Everything in three review documents is a function of numbers nobody has measured.
+
+---
+
+## 2026-08-21 — Layout phase closed to placement; handoff to a second machine
+
+Full record in **`docs/20_layout_phase.md`**. Summary of what happened and what it cost.
+
+**Placement is complete.** 160 × 140 mm, 184 footprints, zero courtyard overlaps, DRC clean
+except unconnected. Routing has not started and the **2-layer vs 4-layer decision is still
+open** — that is the next thing that has to be settled, and it should be settled before a
+single track is drawn.
+
+**The board grew because I measured the wrong thing.** The Ø16 bulk cans did not fit between
+the coil connectors, and I had declared the placement feasible using *pad extents* instead of
+*courtyards*. The Molex 38969-0002 courtyard is 26.6 × 29.9 mm — far larger than the region
+its pads occupy — so on pad extents J203 and J204 read as clear when they were not. Sebastian
+caught it from the canvas before I did. The checker was rewritten to read `F.CrtYd`, including
+`fp_circle` for radial electrolytics, and that path now produces every clearance number in the
+project. Board went 160 × 100 → 160 × 140.
+
+**One structural defect found and analysed.** CH2 had been built as an exact +65 mm translation
+of CH1. That is wrong here, because the coil connectors are mirrored — J203 left of CH1, J204
+right of CH2 — so CH2's leg A ends up furthest from its own shunt and its SW_A node, 0–60 V at
+~0.5 V/ns, has to cross leg B's high-current territory. The fix is to swap the two legs inside
+CH2 so it becomes a true mirror rather than a translation. `SW_A 55.6 → 25.8 mm`, at a cost of
+`COIL_B2 97.0 → 105.8 mm`. **Analysed and verified, not yet applied.**
+
+**A retraction, in the same session as the claim.** I reported in chat that the swap makes the
+two legs "trade" commutation-loop values, 17.7 ↔ 16.7 mm. That was a misreading of my own
+output. The loops are **unchanged** — the bridge ceramics move with their blocks and land on
+each other's coordinates, so each leg finds a ceramic at exactly the same distance as before.
+Corrected in `20_layout_phase.md` §20.4. Separately, the loop figures quoted earlier in chat
+(12.9 / 18.7 mm and similar) came from a different metric definition and are not comparable to
+the ones now in the document; §20.3 states the definition explicitly so this cannot recur.
+
+**The analysis is now a tool, not a transcript.** Everything above is reproducible by running
+`python3 tools/lay.py` from the project root: courtyard overlaps, switching-node spans,
+commutation loops, mounting-hole and outline clearances, heatsink-shadow intrusions, plus two
+checks specific to the pending edit — a leg-membership audit confirming every leg-local net is
+fully contained in one moving block, and a selection-window check confirming the two rubber-band
+windows catch exactly the intended 21 footprints each. It also simulates the swap, so the
+before/after numbers can be confirmed rather than trusted.
+
+This matters more than it sounds. The script had been living in `/tmp` on one workstation.
+Every clearance and loop number in three documents traced back to it, and none of them could
+have been re-derived once that machine was gone. It is now in the repository.
+
+**Handoff.** Work is moving to a second computer. `HANDOFF.md` at the repository root carries
+the state of the design, the three remaining steps of the leg swap with exact coordinates, the
+verification command, and the transfer options — the repository has no git remote, which is
+worth fixing now that two machines are in play.
+
+**Unchanged from the schematic close-out:** the coil is still unmeasured. Placement is
+structurally sound and resting on numbers nobody has taken yet, which is exactly where the
+schematic was when it was closed. §4.1's thermal figures are still derived under locked
+antiphase and still need redoing under unipolar.

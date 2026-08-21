@@ -14,3 +14,6 @@ fp-info-cache
 
 # parked stale copies, kept on disk but not in the repo
 _old/
+
+# staged for manual deletion (agent cannot rm on this mount)
+_to_delete/
