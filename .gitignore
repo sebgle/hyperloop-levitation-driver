@@ -17,3 +17,10 @@ _old/
 
 # staged for manual deletion (agent cannot rm on this mount)
 _to_delete/
+
+# transfer artifact, regenerate with: git bundle create ../final_lev.bundle --all
+final_lev.bundle
+
+# python bytecode
+__pycache__/
+*.pyc
