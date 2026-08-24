@@ -250,7 +250,9 @@ def window_check(F):
 if __name__ == '__main__':
     B = parse(False)
     report(B, 'CURRENT BOARD')
-    leg_audit(B)
-    window_check(B)
-    A = parse(True)
-    report(A, 'SIMULATED: after the CH2 leg A/B swap (+/-30 mm in X)')
+    # The CH2 leg A/B swap was APPLIED 2026-08-22 (commit c9f1e50).
+    # leg_audit() and window_check() described the board BEFORE that edit, and
+    # parse(True) would shift the legs a SECOND time -- 26 courtyard overlaps
+    # and parts 13 mm off the board. The SHIFT table and those functions are
+    # kept as a record of the edit, but are no longer run.
+    # See docs/20_layout_phase.md section 20.4.
