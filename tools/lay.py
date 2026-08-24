@@ -28,7 +28,9 @@ import re, math, sys, os
 PCB = sys.argv[1] if len(sys.argv) > 1 else 'final_lev.kicad_pcb'
 if not os.path.exists(PCB):
     sys.exit('cannot find %s -- run this from the project folder' % PCB)
-s = open(PCB).read()
+# encoding is explicit: on Windows, open() defaults to the locale encoding (cp1252),
+# which would throw or corrupt the moment a micro/ohm/degree sign appears in a field.
+s = open(PCB, encoding='utf-8', errors='replace').read()
 
 # ---------------------------------------------------------------- board outline
 _r = re.search(r'\(gr_rect\s*\(start ([-\d.]+) ([-\d.]+)\)\s*\(end ([-\d.]+) ([-\d.]+)\)'

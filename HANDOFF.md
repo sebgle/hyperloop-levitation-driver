@@ -110,11 +110,14 @@ need to arrive get routed around them.
 
 ## 6. Verification
 
-```
-python3 tools/lay.py
+```powershell
+py tools\lay.py
 ```
 
-Run from the project root. Re-derives everything from the board file: courtyard overlaps,
+Run from the project root in **PowerShell**. If `py` is not on PATH try `python tools\lay.py`;
+`python3` is a Linux/macOS name and usually does not exist on Windows. The script is stdlib-only
+(`re`, `math`, `sys`, `os`) and reads the board file as explicit UTF-8, so it is safe on a
+Windows locale. Re-derives everything from the board file: courtyard overlaps,
 switching-node spans, commutation loops, mounting-hole and outline clearances, heatsink-shadow
 intrusions, plus a leg-membership audit and a selection-window check.
 
@@ -137,11 +140,14 @@ ignore that section, or delete the `SHIFT` block once you no longer want it.
 2. **`git bundle`** — one file carrying the entire history. One has been generated at
    `final_lev.bundle` in the project root and delivered into the chat, so it can be downloaded
    on the other machine directly. To restore:
+   ```powershell
+   git clone .\final_lev.bundle final_lev
+   cd final_lev
+   git remote remove origin
    ```
-   git clone final_lev.bundle final_lev
-   cd final_lev && git remote remove origin
-   ```
-   To regenerate later: `git bundle create ../final_lev.bundle --all`
+   Do **not** join those with `&&` — Windows PowerShell 5.1 does not support it. Use separate
+   lines, or `;` between them.
+   To regenerate later: `git bundle create ..\final_lev.bundle --all`
 3. **Copy the folder.** `.gitignore` excludes `.history/`, `_old/`, `_to_delete/` and KiCad local
    files. **`lib.pretty/` must travel** — it holds the custom Molex 38969-0002 footprint
    (`389690002.kicad_mod`, registered as `lev_lib` via `fp-lib-table`). Without it the board will
@@ -186,7 +192,7 @@ The conversation history does not travel. The documents do.
 | §4.1 thermal numbers | Still derived under locked antiphase; must be redone under unipolar. |
 | Bus-fault detector §3.2 | Undesigned. |
 | ~9.3 W coil/bus copper loss | Drops to ~6.2 W with the inner layer stitched. `docs/21_stackup_and_layers.md` §21.2. |
-| `_to_delete/` | Contains board backups and stale git lock files. Safe to delete; this session could not remove files on the mount. Also worth running `git gc --prune=now` to sweep stray `tmp_obj_*` files from `.git/objects`. |
+| `_to_delete/` | Board backups and stale git lock files. Safe to delete; this session could not remove files on the mount. In PowerShell: `Remove-Item -Recurse -Force .\_to_delete`. Then `git gc --prune=now` to sweep stray `tmp_obj_*` files from `.git/objects`. |
 
 ---
 
@@ -204,3 +210,6 @@ The conversation history does not travel. The documents do.
 - **No file surgery while KiCad is open.**
 - When patching files: preserve CRLF, back up first, and have the script print the number it
   *computed*, not just the number it wrote.
+- Shell commands are for **Windows PowerShell**: no `&&`, backslash paths, `py` (or `python`)
+  rather than `python3`, `Remove-Item` rather than `rm`. Any script written for this project
+  opens files with an explicit encoding, never the platform default.
