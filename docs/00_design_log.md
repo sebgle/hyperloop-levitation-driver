@@ -1528,3 +1528,73 @@ worth fixing now that two machines are in play.
 structurally sound and resting on numbers nobody has taken yet, which is exactly where the
 schematic was when it was closed. §4.1's thermal figures are still derived under locked
 antiphase and still need redoing under unipolar.
+
+---
+
+## 2026-08-24 — CH2 leg swap applied; stackup bug; four layers chosen
+
+**The CH2 leg A/B swap is applied and verified.** Leg B −30 mm X, leg A +30 mm X, 42 footprints
+including the bridge ceramics, Y and rotation unchanged on every part.
+
+```
+/CH2/SW_A       55.6 -> 25.8 mm      the fix
+/CH2/COIL_B2    97.0 -> 105.8 mm     the accepted cost
+courtyard overlaps                   0
+commutation loops    CH2 A 17.7 mm, CH2 B 16.7 mm    unchanged
+FET thermal order    CH1 C-H-C-H     CH2 C-H-C-H     preserved
+all 42 coordinates exact against the target table
+```
+
+**How it went is worth recording.** Three consecutive KiCad "Move Exactly" dialogs landed on
+offsets we did not ask for — −32.08, then −33.0, then +29.5, each time as a perfectly rigid
+block. The blocks were internally correct every time; only the translation was wrong. Rather
+than roll the dice a fourth time, KiCad was closed and the 42 coordinates were patched directly
+into the board file.
+
+**Two near-misses in that patch, both caught before writing:**
+
+The first version of the patch script read the file in Python text mode. The board is CRLF —
+59,557 line endings — and writing it back would have converted the entire file to LF: a
+59,557-line diff for a 42-number change. Caught by comparing the in-memory length against the
+on-disk byte count. The applied version is binary-safe and the CRLF count is byte-identical
+before and after.
+
+The second was in the stackup fix below, and is recorded there.
+
+---
+
+**The stackup carried 0.007 mm copper.** Ten times too thin, against a documented intent of
+0.07 mm (2 oz). Nothing already done depended on it — KiCad does not compute ampacity — but it
+propagates into fab outputs, and at 0.007 mm the coil pours would have dissipated ten times the
+intended power. Fixed; board total 1.474 → 1.600 mm.
+
+The first attempt at that fix also moved the core to 1.46 mm, which would have made the total
+1.62 mm. It was caught in the script's own printed output and reverted immediately. Cheap
+lesson: have the script print the number it *computed*, not just the number it wrote.
+
+---
+
+**Four layers, 1 oz inner.** Full reasoning in `docs/21_stackup_and_layers.md`.
+
+The copper-loss argument did **not** decide it. The placed pours are 10.7 mm, which is exactly
+the IPC-2221 width for 30 A at ΔT = 20 °C — already correct — and an inner layer saves only
+3.1 W of the 9.30 W in the coil paths, on a ~54 W board.
+
+What decided it, in order: choosing four now is free while choosing two and being wrong means a
+reroute, since the placement is identical either way. A standard 1.6 mm 4-layer puts the ground
+plane 0.2 mm under the FET row instead of 1.44 mm away. The current-sense chain — 0.5 mΩ at
+25 mV/A, ×50, with a ±45 A trip standing between a fault and four dead FETs — deserves a
+continuous plane beneath it. And with 158 SMD footprints against just 72 through-holes, the
+inner plane here is nearly solid.
+
+The case against is recorded in §21.3 rather than omitted: two layers might well work, and on a
+volume cost-driven build the 2-layer attempt should be made first. This is a prototype resting
+on an unmeasured coil, and margin gets bought where it is cheap.
+
+**Two constraints fell out of the numbers**, both in §21.5. The `HV_POWER` net class has a 3.0 mm
+track width covering `+60V`, `GND`, `*SW_*` and `*COIL_*` — routing a 30 A net as a 3.0 mm track
+gives a ~164 °C rise, so these nets must be zones, never tracks. And an inner layer only helps
+if current can reach it: **20 vias per 30 A layer transition** at 0.6 mm drill.
+
+**Still unmeasured: the coil.** Unchanged since the schematic close-out, and still the thing
+every thermal number depends on.
