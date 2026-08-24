@@ -1,0 +1,13 @@
+(version 1)
+
+# 30 A nets are copper pour, not track.
+# IPC-2221 external, 2 oz, 30 A -> 10.7 mm at dT=20 C. 3.0 mm would be ~160 C.
+(rule "HV_POWER conductors must be sized for 30 A"
+	(constraint track_width (min 10.7mm))
+	(condition "A.hasNetclass('HV_POWER')"))
+
+# docs/21 section 21.4: In1.Cu is a solid GND plane, no routing, ever.
+# Vias must still pass through it, so only tracks are disallowed.
+(rule "In1.Cu carries no tracks"
+	(constraint disallow track)
+	(condition "A.Layer == 'In1.Cu'"))

@@ -202,12 +202,71 @@ Both inside, zero courtyard overlaps board-wide.
 
 ---
 
+## 20.8 Leg-A bridge ceramic orientation
+
+Found 2026-08-24 while laying out the CH1 leg A commutation loop, before any copper was
+placed.
+
+The C-H-C-H thermal ordering in §20.2 forces the two legs into opposite pin orders:
+
+```
+leg A:  Q2 (low)  then Q1 (high)   ->  GND  at x = 130.08,  +60V at x = 142.54
+leg B:  Q3 (high) then Q4 (low)    ->  +60V at x = 157.54,  GND  at x = 175.08
+```
+
+Leg A therefore wants +60 V on its **right**; leg B wants it on its **left**. Every bridge
+ceramic was placed at 0°, which puts pad 1 (+60V) on the left — correct for leg B, backwards
+for leg A. Nobody chose this: it is the library default orientation meeting a constraint that
+came from thermals.
+
+| | before | after |
+|---|---|---|
+| CH1 A loop | 17.72 / 17.79 mm | **12.89 / 13.08 mm** |
+| CH2 A loop | 17.72 / 17.79 mm | **12.89 / 13.08 mm** |
+| CH1 B loop | 16.73 / 16.81 mm | 16.73 / 16.81 mm |
+| CH2 B loop | 16.73 / 16.81 mm | 16.73 / 16.81 mm |
+| board worst-case loop | 17.79 mm | **16.81 mm** |
+| courtyard overlaps | 0 | **0** |
+| heatsink-shadow intrusions | none | none |
+
+**27 % off leg A for a rotation.** Ten parts — C3, C5, C6, C7, C8 and C212, C214, C215, C216,
+C217 — 0° → 180°. X, Y, nets and courtyards unchanged; pad 1 keeps net `+60V` and simply lands
+on the other side of the body. Leg B’s ceramics (C11–C15, C219–C223) stay at 0°, where
+rotating them would make things worse: 16.73 → 22.26 mm.
+
+Applied by `tools/rot_ceramics.py --write` with KiCad closed. 80 lines changed of 59,584.
+
+### The file format was established, not assumed
+
+A 0 → 180 rotation was not guessed at. It was derived by diffing U1 (0°) against U2 (180°) —
+the same SOIC-8 footprint, in this same board file:
+
+```
+U1   (at 132.5 77)       Reference (0 -3.5 0)    fp_text ${REFERENCE} (0 0 90)
+U2   (at 162.5 77 180)   Reference (0 -3.5 180)  fp_text ${REFERENCE} (0 0 270)
+```
+
+So KiCad adds the angle to the footprint’s own `(at)` and adds 180 to the angle field of every
+`(at)` inside a `property` or `fp_text` sub-block, leaving local offsets, pads and graphics
+alone — 8 `(at)` lines per capacitor here. Patching only the footprint angle would have left
+these ten silkscreen designators stored differently from every other rotated part on the board.
+
+### The check lives in the tool
+
+`rot_ceramics.py` refuses to run while `~final_lev.kicad_pcb.lck` exists, so the "no file
+surgery while KiCad is open" rule is enforced rather than remembered. It reads and writes
+bytes, so CRLF survives. After patching it re-parses **its own patched buffer**, recomputes all
+four commutation loops and the full 184-footprint courtyard check from the patched geometry,
+and writes nothing unless those agree. The numbers it prints are the ones it computed.
+
+---
+
 ## 20.7 Open after this phase
 
 | Item | Note |
 |---|---|
-| **2 layers vs 4 layers** | Blocking. Must be settled before routing. |
-| CH2 leg swap | Analysed and verified; not yet applied. Steps in `HANDOFF.md`. |
+| ~~2 layers vs 4 layers~~ | **Settled 2026-08-24: four layers, 1 oz inner.** Reasoning in `21_stackup_and_layers.md`; Board Setup reconfigured. |
+| ~~CH2 leg swap~~ | **Applied and verified 2026-08-24.** `/CH2/SW_A` 55.6 → 25.8 mm. |
 | Coil L, R, k | Still unmeasured. Everything thermal depends on it. |
 | §4.1 thermal numbers | Still derived under locked antiphase; must be redone under unipolar. |
 | Bus-fault detector §3.2 | Undesigned. |

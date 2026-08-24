@@ -1598,3 +1598,67 @@ if current can reach it: **20 vias per 30 A layer transition** at 0.6 mm drill.
 
 **Still unmeasured: the coil.** Unchanged since the schematic close-out, and still the thing
 every thermal number depends on.
+
+---
+
+## 2026-08-24 (cont.) — Board Setup for four layers; net classes; leg-A ceramics
+
+**Board Setup is reconfigured.** Physical Stackup now carries four copper layers, verified
+from the board file rather than the dialog: F.Mask 0.01 / F.Cu 0.07 / prepreg 0.2 / In1.Cu
+0.035 / core 0.97 / In2.Cu 0.035 / prepreg 0.2 / B.Cu 0.07 / B.Mask 0.01, summing to exactly
+1.600 mm. In1.Cu and In2.Cu are typed `power`.
+
+The only number that carries design weight is the **0.2 mm F.Cu→In1.Cu prepreg**. Loop
+inductance over a return plane goes as μ₀·h/w, so for a 10 mm length of the 10.7 mm pour:
+1.69 nH at h = 1.44 mm (two layers) against 0.235 nH at h = 0.2 mm — about 1.5 V less overshoot
+per 10 mm of run at 30 A in ~30 ns. Everything else in the stackup is bookkeeping to reach
+1.600 mm, and 0.97 mm is not a stocked core; it is the residue. Logged as **A15**.
+
+**The fab question is half answered.** JLCPCB lists 2 oz outer as a standard FR4 option and
+1 oz inner as an available multilayer option — but inner copper **defaults to 0.5 oz**. If 1 oz
+inner is not ordered explicitly, the In2.Cu parallel-copper saving falls from 9.30 → 6.20 W to
+9.30 → 7.44 W. That is an ordering checkbox, not a design change, and it is easy to lose.
+
+**The `HV_POWER` trap is closed.** The 3.0 mm class width was re-derived independently before
+being changed: IPC-2221 external, `I = k·ΔT^0.44·A^0.725`, k = 0.048 gives 1166 mil² (10.6 mm at
+2 oz) for 30 A at ΔT = 20 °C, and 3.0 mm reversed out at **160 °C** — matching §21.5’s 164 °C
+closely enough to confirm it. Resolved against all 99 nets, the class also contained `GND`
+(119 pads) and the four bootstrap nets, so every logic ground stub defaulted to 3.0 mm. Split
+into `HV_POWER` (7 nets, 62 pads), `HV_BOOT` (4 nets, 12 pads) and `PWR_GND` (1 net, 119 pads);
+`*VBATT*` matched nothing and was deleted. Logged as **A16**.
+
+Clearance was left at 0.3 mm on evidence rather than raised on instinct. IPC-2221B Table 6-1 at
+51–100 V wants 0.13 mm coated and 0.6 mm uncoated; under mask 0.3 mm is 2.3×, and the uncoated
+case is set by pad geometry, not by a net class. Measured across 89 HV pads with true rotated
+pad outlines, the tightest 60 V pair is **0.635 mm** — the TO-220 lead pitch — which passes the
+uncoated requirement by 6 % and which no net class can change. Worth remembering before anyone
+specifies conformal coating or an altitude rating.
+
+**Two DRC rules now enforce what documents used to.** A `track_width (min 10.7mm)` constraint on
+`HV_POWER` makes an under-width 30 A track an error, and `disallow track` on In1.Cu makes
+§21.4’s "no routing, ever" a machine check. This is the `lay.py` lesson applied again: a rule
+that lives in a document is only as good as your memory of it.
+
+A note on testing them. The first attempt drew a track on `+60V` and got no violation — which
+looked like a broken rule and was not. The netclass width had just been set to 10.7 mm, the
+router used it, and a 10.7 mm track legitimately passes. The trap is that **"no violation" is
+equally consistent with "the rule works" and "the condition never matches"**, so a rule is not
+proven until something that should fail does.
+
+**Leg-A bridge ceramics rotated 180°.** Found at the start of routing; full record in
+`20_layout_phase.md` §20.8. The C-H-C-H thermal order forces leg A to be low-then-high and leg B
+high-then-low, so leg A wants +60 V on its right while every ceramic sat at 0° with +60 V on the
+left. Ten parts rotated, positions untouched: **CH1 A and CH2 A loops 17.72 → 12.89 mm**, leg B
+unchanged, overlaps still 0. The board’s worst-case commutation loop is now leg B at 16.81 mm.
+
+Applied by `tools/rot_ceramics.py`, which refuses to run against a locked board file, and which
+recomputes the loops and the 184-footprint courtyard check from its own patched buffer before
+writing anything.
+
+**Routing still has not started.** §21.7 step 1 needs amending first: the ceramic +60V and GND
+pads alternate along the row at 3.1 mm pitch, so two F.Cu regions would have to interdigitate,
+and in leg A they would cross outright. The intended answer is the one four layers was bought
+for — +60 V on F.Cu, GND returning through the In1.Cu plane directly beneath it. Not yet
+designed.
+
+**Still unmeasured: the coil.** Unchanged.

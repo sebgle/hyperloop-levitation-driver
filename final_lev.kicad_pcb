@@ -9,6 +9,8 @@
 	(paper "A4")
 	(layers
 		(0 "F.Cu" signal)
+		(4 "In1.Cu" power)
+		(6 "In2.Cu" power)
 		(2 "B.Cu" signal)
 		(9 "F.Adhes" user "F.Adhesive")
 		(11 "B.Adhes" user "B.Adhesive")
@@ -28,7 +30,7 @@
 		(29 "B.CrtYd" user "B.Courtyard")
 		(35 "F.Fab" user)
 		(33 "B.Fab" user)
-		(39 "User.1" user)
+		(39 "User.1" back)
 		(41 "User.2" user)
 		(43 "User.3" user)
 		(45 "User.4" user)
@@ -50,8 +52,30 @@
 				(thickness 0.07)
 			)
 			(layer "dielectric 1"
+				(type "prepreg")
+				(thickness 0.2)
+				(material "FR4")
+				(epsilon_r 4.5)
+				(loss_tangent 0.02)
+			)
+			(layer "In1.Cu"
+				(type "copper")
+				(thickness 0.035)
+			)
+			(layer "dielectric 2"
 				(type "core")
-				(thickness 1.44)
+				(thickness 0.97)
+				(material "FR4")
+				(epsilon_r 4.5)
+				(loss_tangent 0.02)
+			)
+			(layer "In2.Cu"
+				(type "copper")
+				(thickness 0.035)
+			)
+			(layer "dielectric 3"
+				(type "prepreg")
+				(thickness 0.2)
 				(material "FR4")
 				(epsilon_r 4.5)
 				(loss_tangent 0.02)
@@ -62,6 +86,7 @@
 			)
 			(layer "B.Mask"
 				(type "Bottom Solder Mask")
+				(color "Green")
 				(thickness 0.01)
 			)
 			(layer "B.Paste"
@@ -4573,11 +4598,11 @@
 	(footprint "Capacitor_SMD:C_1210_3225Metric_Pad1.33x2.70mm_HandSolder"
 		(layer "F.Cu")
 		(uuid "0c28331f-826c-47a0-af6f-1e88476ae69f")
-		(at 222.5 66)
+		(at 222.5 66 180)
 		(descr "Capacitor SMD 1210 (3225 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "capacitor handsolder")
 		(property "Reference" "C212"
-			(at 0 2.5 0)
+			(at 0 2.5 180)
 			(layer "F.SilkS")
 			(uuid "1ce9bd3d-671b-432c-97ec-2a38327a6876")
 			(effects
@@ -4588,7 +4613,7 @@
 			)
 		)
 		(property "Value" "1uF"
-			(at 0 2.3 0)
+			(at 0 2.3 180)
 			(layer "F.Fab")
 			(uuid "bd812b14-4c39-449c-9063-f7b2efb7b151")
 			(effects
@@ -4599,7 +4624,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "521fb757-9dc3-4032-aedc-1248d46eecfc")
@@ -4610,7 +4635,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "6efa58c8-8dfa-4c30-a27e-2d53222f5601")
@@ -4621,7 +4646,7 @@
 			)
 		)
 		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.SilkS")
 			(hide yes)
 			(uuid "98c3b009-8353-49b6-8f9a-481a609150de")
@@ -4633,7 +4658,7 @@
 			)
 		)
 		(property "Voltage" "100V"
-			(at 0 0 0)
+			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
@@ -4658,16 +4683,6 @@
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
-			(start -0.711252 -1.36)
-			(end 0.711252 -1.36)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "2056aa60-ae54-4b5f-9a5e-6d764d22865e")
-		)
-		(fp_line
 			(start -0.711252 1.36)
 			(end 0.711252 1.36)
 			(stroke
@@ -4676,6 +4691,16 @@
 			)
 			(layer "F.SilkS")
 			(uuid "c796207a-bfc7-4593-a089-53607006ba0c")
+		)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "2056aa60-ae54-4b5f-9a5e-6d764d22865e")
 		)
 		(fp_rect
 			(start -2.48 -1.6)
@@ -4700,7 +4725,7 @@
 			(uuid "d3a8796c-336f-47e2-88f8-b842a9b760a9")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(uuid "e349b6ed-cfa5-43be-b919-65ea160c8897")
 			(effects
@@ -9443,11 +9468,11 @@
 	(footprint "Capacitor_SMD:C_1210_3225Metric_Pad1.33x2.70mm_HandSolder"
 		(layer "F.Cu")
 		(uuid "2675545f-65ee-4105-ad0d-a3c81274db51")
-		(at 127.5 66)
+		(at 127.5 66 180)
 		(descr "Capacitor SMD 1210 (3225 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "capacitor handsolder")
 		(property "Reference" "C5"
-			(at 0 2.5 0)
+			(at 0 2.5 180)
 			(layer "F.SilkS")
 			(uuid "0e7b3f06-3d5c-4b13-8f8c-fceb2d209c5d")
 			(effects
@@ -9458,7 +9483,7 @@
 			)
 		)
 		(property "Value" "1uF"
-			(at 0 2.3 0)
+			(at 0 2.3 180)
 			(layer "F.Fab")
 			(uuid "7f6a78ee-85f9-45f3-8fe4-1d6677f19034")
 			(effects
@@ -9469,7 +9494,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "d43d7ea0-874f-4b0f-8a51-0e883524be16")
@@ -9480,7 +9505,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "b0613aa3-b35d-4734-aac0-d834e6955c6c")
@@ -9491,7 +9516,7 @@
 			)
 		)
 		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.SilkS")
 			(hide yes)
 			(uuid "9876b027-3f7b-4c41-8473-e3691f0ab0e4")
@@ -9503,7 +9528,7 @@
 			)
 		)
 		(property "Voltage" "100V"
-			(at 0 0 0)
+			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
@@ -9528,16 +9553,6 @@
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
-			(start -0.711252 -1.36)
-			(end 0.711252 -1.36)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "9560fc54-9410-4c95-b6de-2301d7f130cf")
-		)
-		(fp_line
 			(start -0.711252 1.36)
 			(end 0.711252 1.36)
 			(stroke
@@ -9546,6 +9561,16 @@
 			)
 			(layer "F.SilkS")
 			(uuid "3efd4d90-9730-4aee-82a0-69c6308c488d")
+		)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "9560fc54-9410-4c95-b6de-2301d7f130cf")
 		)
 		(fp_rect
 			(start -2.48 -1.6)
@@ -9570,7 +9595,7 @@
 			(uuid "407ff943-e358-43ae-b3c8-b2fc3e1a7fb3")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(uuid "bdd25367-9ce6-4faf-9052-50cf286d36ed")
 			(effects
@@ -9614,11 +9639,11 @@
 	(footprint "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 		(layer "F.Cu")
 		(uuid "27597ac6-81ce-492c-9e5b-e2f219154e62")
-		(at 231.5 69.5)
+		(at 231.5 69.5 180)
 		(descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing)")
 		(tags "capacitor handsolder")
 		(property "Reference" "C217"
-			(at -1 2 0)
+			(at -1 2 180)
 			(layer "F.SilkS")
 			(uuid "b5a8da1f-8bf4-4677-87dc-c76c652119a7")
 			(effects
@@ -9629,7 +9654,7 @@
 			)
 		)
 		(property "Value" "100nF"
-			(at 0 1.68 0)
+			(at 0 1.68 180)
 			(layer "F.Fab")
 			(uuid "eec93c23-e185-4002-935f-343c1eff902b")
 			(effects
@@ -9640,7 +9665,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "bf9929a1-e4f8-4e30-ab81-48785fd14ba8")
@@ -9651,7 +9676,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "0ab73592-bb7f-4a79-9f15-fb591bc711d0")
@@ -9662,7 +9687,7 @@
 			)
 		)
 		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.SilkS")
 			(hide yes)
 			(uuid "c9dd6339-4b74-4eb1-a015-18d131f2c69d")
@@ -9674,7 +9699,7 @@
 			)
 		)
 		(property "Voltage" "100V"
-			(at 0 0 0)
+			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
@@ -9699,16 +9724,6 @@
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
-			(start -0.261252 -0.735)
-			(end 0.261252 -0.735)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "863e9371-7e99-42d0-9d74-c935d642261d")
-		)
-		(fp_line
 			(start -0.261252 0.735)
 			(end 0.261252 0.735)
 			(stroke
@@ -9717,6 +9732,16 @@
 			)
 			(layer "F.SilkS")
 			(uuid "407701a2-dd2a-43cd-aafc-b27727d80cf1")
+		)
+		(fp_line
+			(start -0.261252 -0.735)
+			(end 0.261252 -0.735)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "863e9371-7e99-42d0-9d74-c935d642261d")
 		)
 		(fp_rect
 			(start -1.88 -0.98)
@@ -9741,7 +9766,7 @@
 			(uuid "3dbff099-7d3e-4733-ad84-5357871b43ab")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(uuid "32bc0783-c3af-4bc3-ae0c-64b91569135a")
 			(effects
@@ -23314,11 +23339,11 @@
 	(footprint "Capacitor_SMD:C_1210_3225Metric_Pad1.33x2.70mm_HandSolder"
 		(layer "F.Cu")
 		(uuid "67ec958c-0e83-4ccb-b688-290d28852d9b")
-		(at 240.5 66)
+		(at 240.5 66 180)
 		(descr "Capacitor SMD 1210 (3225 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "capacitor handsolder")
 		(property "Reference" "C216"
-			(at 0 2.5 0)
+			(at 0 2.5 180)
 			(layer "F.SilkS")
 			(uuid "23916556-7070-4f74-a5f8-51f856522f54")
 			(effects
@@ -23329,7 +23354,7 @@
 			)
 		)
 		(property "Value" "1uF"
-			(at 0 2.3 0)
+			(at 0 2.3 180)
 			(layer "F.Fab")
 			(uuid "83a762b0-f4bc-4f4d-ba84-0a17de9f5a10")
 			(effects
@@ -23340,7 +23365,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "a54b2874-a755-4add-bfac-9e4757cfd49e")
@@ -23351,7 +23376,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "8e40bdc6-e0a1-4e3f-bb09-b7c64bc8706f")
@@ -23362,7 +23387,7 @@
 			)
 		)
 		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.SilkS")
 			(hide yes)
 			(uuid "297ffdec-f725-45ad-ade2-afdec86323ef")
@@ -23374,7 +23399,7 @@
 			)
 		)
 		(property "Voltage" "100V"
-			(at 0 0 0)
+			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
@@ -23399,16 +23424,6 @@
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
-			(start -0.711252 -1.36)
-			(end 0.711252 -1.36)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "e5f7d17f-fdc2-4b1d-8c97-5b66be88da9f")
-		)
-		(fp_line
 			(start -0.711252 1.36)
 			(end 0.711252 1.36)
 			(stroke
@@ -23417,6 +23432,16 @@
 			)
 			(layer "F.SilkS")
 			(uuid "4c9451b2-17dc-41d4-8c00-45b20c602e48")
+		)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "e5f7d17f-fdc2-4b1d-8c97-5b66be88da9f")
 		)
 		(fp_rect
 			(start -2.48 -1.6)
@@ -23441,7 +23466,7 @@
 			(uuid "c5f555ff-f9bf-4526-87c7-54c8cc900515")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(uuid "d2aaefc8-98c3-47c1-bfbf-dcb98d138955")
 			(effects
@@ -32676,11 +32701,11 @@
 	(footprint "Capacitor_SMD:C_1210_3225Metric_Pad1.33x2.70mm_HandSolder"
 		(layer "F.Cu")
 		(uuid "906f9fb5-eb7b-4db4-baab-03d3adf150ca")
-		(at 145.5 66)
+		(at 145.5 66 180)
 		(descr "Capacitor SMD 1210 (3225 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "capacitor handsolder")
 		(property "Reference" "C8"
-			(at 0 2.5 0)
+			(at 0 2.5 180)
 			(layer "F.SilkS")
 			(uuid "464150c9-1118-4ee7-9b7c-e28e6448db2e")
 			(effects
@@ -32691,7 +32716,7 @@
 			)
 		)
 		(property "Value" "1uF"
-			(at 0 2.3 0)
+			(at 0 2.3 180)
 			(layer "F.Fab")
 			(uuid "5a93b36d-c40e-4e25-9765-df883f60194f")
 			(effects
@@ -32702,7 +32727,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "2041d431-d1ac-4c9a-8772-d24d904d8967")
@@ -32713,7 +32738,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "ddefbde0-16bd-4395-908e-787117f6090b")
@@ -32724,7 +32749,7 @@
 			)
 		)
 		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.SilkS")
 			(hide yes)
 			(uuid "ae94fe0a-4015-47f5-b866-6db445fdfd91")
@@ -32736,7 +32761,7 @@
 			)
 		)
 		(property "Voltage" "100V"
-			(at 0 0 0)
+			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
@@ -32761,16 +32786,6 @@
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
-			(start -0.711252 -1.36)
-			(end 0.711252 -1.36)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "cd48e8a9-ff38-4736-a76e-29f7355ba4a0")
-		)
-		(fp_line
 			(start -0.711252 1.36)
 			(end 0.711252 1.36)
 			(stroke
@@ -32779,6 +32794,16 @@
 			)
 			(layer "F.SilkS")
 			(uuid "afad8818-60cd-4def-97c1-9323cd181b3a")
+		)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "cd48e8a9-ff38-4736-a76e-29f7355ba4a0")
 		)
 		(fp_rect
 			(start -2.48 -1.6)
@@ -32803,7 +32828,7 @@
 			(uuid "ac5abe55-3141-454b-97f9-6256ddbae10c")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(uuid "4f5f7d7b-26e8-4808-8c4d-795bd91e4e21")
 			(effects
@@ -42111,11 +42136,11 @@
 	(footprint "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 		(layer "F.Cu")
 		(uuid "b4969577-07c0-4fa8-9397-d6896628407c")
-		(at 136.5 69.5)
+		(at 136.5 69.5 180)
 		(descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing)")
 		(tags "capacitor handsolder")
 		(property "Reference" "C3"
-			(at 0 2 0)
+			(at 0 2 180)
 			(layer "F.SilkS")
 			(uuid "fa649ccc-1b70-448e-91b8-dab7301be0bc")
 			(effects
@@ -42126,7 +42151,7 @@
 			)
 		)
 		(property "Value" "100nF"
-			(at 0 1.68 0)
+			(at 0 1.68 180)
 			(layer "F.Fab")
 			(uuid "14fd76c8-cb98-4ebe-8815-4d7c32390632")
 			(effects
@@ -42137,7 +42162,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "cb43d2b7-3a63-4182-856d-43c27a3dcdfa")
@@ -42148,7 +42173,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "e6a4d16d-db91-40ca-852c-f04977755a0b")
@@ -42159,7 +42184,7 @@
 			)
 		)
 		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.SilkS")
 			(hide yes)
 			(uuid "a48738c3-ea63-4f32-93d4-6c6b9ec0dc95")
@@ -42171,7 +42196,7 @@
 			)
 		)
 		(property "Voltage" "100V"
-			(at 0 0 0)
+			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
@@ -42196,16 +42221,6 @@
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
-			(start -0.261252 -0.735)
-			(end 0.261252 -0.735)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "70949c99-2808-43ba-8268-bd3217dd036f")
-		)
-		(fp_line
 			(start -0.261252 0.735)
 			(end 0.261252 0.735)
 			(stroke
@@ -42214,6 +42229,16 @@
 			)
 			(layer "F.SilkS")
 			(uuid "ab7b7b6e-8249-4ed1-af6e-d90e805fd9ec")
+		)
+		(fp_line
+			(start -0.261252 -0.735)
+			(end 0.261252 -0.735)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "70949c99-2808-43ba-8268-bd3217dd036f")
 		)
 		(fp_rect
 			(start -1.88 -0.98)
@@ -42238,7 +42263,7 @@
 			(uuid "5a6752ce-5c1a-4414-86ce-40adf3138814")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(uuid "ee81305f-539d-4b63-aa36-1ba764e0ca41")
 			(effects
@@ -42876,11 +42901,11 @@
 	(footprint "Capacitor_SMD:C_1210_3225Metric_Pad1.33x2.70mm_HandSolder"
 		(layer "F.Cu")
 		(uuid "b973ef4e-359d-46fb-8d08-e02af58960d3")
-		(at 139.5 66)
+		(at 139.5 66 180)
 		(descr "Capacitor SMD 1210 (3225 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "capacitor handsolder")
 		(property "Reference" "C7"
-			(at 0 2.5 0)
+			(at 0 2.5 180)
 			(layer "F.SilkS")
 			(uuid "8650bb87-245f-4c15-a0ec-104efd661b39")
 			(effects
@@ -42891,7 +42916,7 @@
 			)
 		)
 		(property "Value" "1uF"
-			(at 0 2.3 0)
+			(at 0 2.3 180)
 			(layer "F.Fab")
 			(uuid "0d9b0b53-95ff-4126-8510-8b62ed23376c")
 			(effects
@@ -42902,7 +42927,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "d519aa13-900b-4ccd-a169-982df9170d16")
@@ -42913,7 +42938,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "20495cda-4d5d-4a05-9b3e-73ba6b373723")
@@ -42924,7 +42949,7 @@
 			)
 		)
 		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.SilkS")
 			(hide yes)
 			(uuid "2e2549ef-8cf0-4dfe-bbde-8e39ef4ff258")
@@ -42936,7 +42961,7 @@
 			)
 		)
 		(property "Voltage" "100V"
-			(at 0 0 0)
+			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
@@ -42961,16 +42986,6 @@
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
-			(start -0.711252 -1.36)
-			(end 0.711252 -1.36)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "b60f21f6-7a25-4506-ae25-94a6dfde1d10")
-		)
-		(fp_line
 			(start -0.711252 1.36)
 			(end 0.711252 1.36)
 			(stroke
@@ -42979,6 +42994,16 @@
 			)
 			(layer "F.SilkS")
 			(uuid "b1e6e9f9-93f2-407f-9729-d0c44e6c3f14")
+		)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "b60f21f6-7a25-4506-ae25-94a6dfde1d10")
 		)
 		(fp_rect
 			(start -2.48 -1.6)
@@ -43003,7 +43028,7 @@
 			(uuid "e405aa15-a8a8-4b15-811d-ac9b4413a5f8")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(uuid "6913fb98-bddf-4313-b948-e19499de9f8e")
 			(effects
@@ -44314,11 +44339,11 @@
 	(footprint "Capacitor_SMD:C_1210_3225Metric_Pad1.33x2.70mm_HandSolder"
 		(layer "F.Cu")
 		(uuid "c078e8e3-519f-4f31-8fb4-7b126da7fea0")
-		(at 234.5 66)
+		(at 234.5 66 180)
 		(descr "Capacitor SMD 1210 (3225 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "capacitor handsolder")
 		(property "Reference" "C215"
-			(at 1 2.5 0)
+			(at 1 2.5 180)
 			(layer "F.SilkS")
 			(uuid "fdc4d951-ebd6-48f8-8dc3-e1f7b8fed3a8")
 			(effects
@@ -44329,7 +44354,7 @@
 			)
 		)
 		(property "Value" "1uF"
-			(at 0 2.3 0)
+			(at 0 2.3 180)
 			(layer "F.Fab")
 			(uuid "1a8cc2cc-f663-49e1-b965-be022d5bdda8")
 			(effects
@@ -44340,7 +44365,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "43af284f-b789-4d7f-af0d-a8e6eb5b228d")
@@ -44351,7 +44376,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "e167bee3-5429-40f4-86fe-d748e699e1f8")
@@ -44362,7 +44387,7 @@
 			)
 		)
 		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.SilkS")
 			(hide yes)
 			(uuid "22221eb8-cbe8-4ce9-8912-3d2d130775fe")
@@ -44374,7 +44399,7 @@
 			)
 		)
 		(property "Voltage" "100V"
-			(at 0 0 0)
+			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
@@ -44399,16 +44424,6 @@
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
-			(start -0.711252 -1.36)
-			(end 0.711252 -1.36)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "045e6e94-b16a-4696-84ef-42d9e3288540")
-		)
-		(fp_line
 			(start -0.711252 1.36)
 			(end 0.711252 1.36)
 			(stroke
@@ -44417,6 +44432,16 @@
 			)
 			(layer "F.SilkS")
 			(uuid "95169b8c-686a-481d-9fc2-43ace2808cd9")
+		)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "045e6e94-b16a-4696-84ef-42d9e3288540")
 		)
 		(fp_rect
 			(start -2.48 -1.6)
@@ -44441,7 +44466,7 @@
 			(uuid "b75cf0f3-2cbe-47b5-88bc-31adca9a3d28")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(uuid "94e8f79b-54dd-4b9e-8cf6-c4748232f616")
 			(effects
@@ -53632,11 +53657,11 @@
 	(footprint "Capacitor_SMD:C_1210_3225Metric_Pad1.33x2.70mm_HandSolder"
 		(layer "F.Cu")
 		(uuid "e3e08d30-5758-41b9-af24-6520f9117bdd")
-		(at 228.5 66)
+		(at 228.5 66 180)
 		(descr "Capacitor SMD 1210 (3225 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "capacitor handsolder")
 		(property "Reference" "C214"
-			(at -1 2.5 0)
+			(at -1 2.5 180)
 			(layer "F.SilkS")
 			(uuid "2e473645-19c9-43a4-80e2-5b6e992dbb03")
 			(effects
@@ -53647,7 +53672,7 @@
 			)
 		)
 		(property "Value" "1uF"
-			(at 0 2.3 0)
+			(at 0 2.3 180)
 			(layer "F.Fab")
 			(uuid "d1cb93fb-765a-418d-ba84-51d22b699450")
 			(effects
@@ -53658,7 +53683,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "ab5b6375-6e6b-468a-8c6f-34b592af7471")
@@ -53669,7 +53694,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "b86c59b9-1d63-41aa-8040-98fb2f49bad0")
@@ -53680,7 +53705,7 @@
 			)
 		)
 		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.SilkS")
 			(hide yes)
 			(uuid "760921f9-0d8e-47a6-801b-8aa157fd1f27")
@@ -53692,7 +53717,7 @@
 			)
 		)
 		(property "Voltage" "100V"
-			(at 0 0 0)
+			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
@@ -53717,16 +53742,6 @@
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
-			(start -0.711252 -1.36)
-			(end 0.711252 -1.36)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "734126d1-fc4c-4aa9-8f57-5c9afbf984cf")
-		)
-		(fp_line
 			(start -0.711252 1.36)
 			(end 0.711252 1.36)
 			(stroke
@@ -53735,6 +53750,16 @@
 			)
 			(layer "F.SilkS")
 			(uuid "1e9c1421-bce0-446e-a595-c4f29ec1558c")
+		)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "734126d1-fc4c-4aa9-8f57-5c9afbf984cf")
 		)
 		(fp_rect
 			(start -2.48 -1.6)
@@ -53759,7 +53784,7 @@
 			(uuid "982f290a-3a02-47c8-ae54-e5a9e1793f37")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(uuid "6b55a66e-a131-47c1-8d69-d3ec772f4736")
 			(effects
@@ -54290,11 +54315,11 @@
 	(footprint "Capacitor_SMD:C_1210_3225Metric_Pad1.33x2.70mm_HandSolder"
 		(layer "F.Cu")
 		(uuid "e8475cb7-5396-44da-a48c-9189bad25684")
-		(at 133.5 66)
+		(at 133.5 66 180)
 		(descr "Capacitor SMD 1210 (3225 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "capacitor handsolder")
 		(property "Reference" "C6"
-			(at 0 2.5 0)
+			(at 0 2.5 180)
 			(layer "F.SilkS")
 			(uuid "f4923df6-a518-4d72-b187-b20fe083ba46")
 			(effects
@@ -54305,7 +54330,7 @@
 			)
 		)
 		(property "Value" "1uF"
-			(at 0 2.3 0)
+			(at 0 2.3 180)
 			(layer "F.Fab")
 			(uuid "ed425ad1-6997-4c44-8340-29935b6a4c62")
 			(effects
@@ -54316,7 +54341,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "8ad49734-3a1f-4d22-9ffe-dbb51797e7cb")
@@ -54327,7 +54352,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "d9c2e52e-3c8d-468f-933d-615958b259e0")
@@ -54338,7 +54363,7 @@
 			)
 		)
 		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.SilkS")
 			(hide yes)
 			(uuid "8d28035a-0244-4303-9e6c-34f870d56b16")
@@ -54350,7 +54375,7 @@
 			)
 		)
 		(property "Voltage" "100V"
-			(at 0 0 0)
+			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
@@ -54375,16 +54400,6 @@
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
-			(start -0.711252 -1.36)
-			(end 0.711252 -1.36)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "e966a680-f31c-46b1-a4eb-70329e6be687")
-		)
-		(fp_line
 			(start -0.711252 1.36)
 			(end 0.711252 1.36)
 			(stroke
@@ -54393,6 +54408,16 @@
 			)
 			(layer "F.SilkS")
 			(uuid "a7a659ab-5e0f-4edd-b827-6199e0bf68ef")
+		)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "e966a680-f31c-46b1-a4eb-70329e6be687")
 		)
 		(fp_rect
 			(start -2.48 -1.6)
@@ -54417,7 +54442,7 @@
 			(uuid "bd33fb3d-6a8e-4797-8bf2-2bb891836e4a")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(uuid "60c6c79b-5928-40ff-8338-f4fb67fb6641")
 			(effects
