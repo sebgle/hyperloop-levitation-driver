@@ -171,7 +171,6 @@ docs/16_adversarial_review.md    38 review findings across three rounds
 docs/18_firmware_interface.md    what the control microcontroller has to send
 docs/20_layout_phase.md          placement and the verified clearances
 docs/21_stackup_and_layers.md    layer stackup and routing order
-HANDOFF.md                       where the project stands and what comes next
 ```
 
 ## Not done

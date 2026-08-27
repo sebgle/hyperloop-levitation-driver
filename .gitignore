@@ -24,3 +24,12 @@ final_lev.bundle
 # python bytecode
 __pycache__/
 *.pyc
+
+# working documents and generated files: kept on disk, out of the repo
+HANDOFF.md
+working/
+_libcheck/
+drc_report.rpt
+final_lev_rev0.net
+docs/_review_packet.txt
+docs/_snapshot_*.net
