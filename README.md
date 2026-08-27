@@ -1,19 +1,22 @@
-# final_lev
+# Hyperloop Levitation Coil Driver
 
 A two-channel H-bridge driver for the levitation coils on a hyperloop pod. It takes PWM from the
-pod's control computer and switches 60 V into two coils at up to 30 A each. Two boards drive the
-pod's four coils.
+pod's control computer and switches 60 V into two coils at up to 30 A each, roughly 1.8 kW per
+coil. Two boards drive the pod's four coils.
 
-KiCad 10 project, plus the design notes, reviews and scripts that check the layout.
+Design work for the levitation subsystem of a student hyperloop pod. The levitation team set the
+requirements. The schematic, board layout, documentation and verification scripts are mine. This
+repository holds the KiCad 10 project along with the design notes, the reviews, and the scripts
+that check the layout.
 
-**Status: schematic done and verified. Placement done. Routing in progress. Board fabrication is next.**
+**Status: schematic done and verified. Placement done. Routing under way. Fabrication after that.**
 
 ## Requirements
 
 | | |
 |---|---|
 | Bus | 60 V max, battery fed |
-| Current | 30 A per coil, 60 A total across four |
+| Current | 30 A per coil by design. The team's stated minimum is 60 A across all four |
 | Coil | About 2 Ω and 10 mH, unmeasured |
 | PWM | 16 kHz now, 32 kHz ceiling |
 | Control | PID runs on a separate MCU. This board takes PWM and a shutdown line |
@@ -42,15 +45,29 @@ decides what the coil sees.
 
 ![H-bridge switching states](docs/bridge.png)
 
-The board moves between these states thousands of times a second, and how long it spends in
-each one sets the average current. The freewheel rows are the interesting part. Locked
-antiphase, the simpler scheme, only alternates between the first two rows, so the full 60 V sits
-across the coil at all times. That would have pushed 52 A of ripple current through capacitors
-rated for about 14 A and destroyed them. Unipolar, the scheme used here, alternates between one
-driving row and one freewheel row, which keeps the average voltage small and gives fine control
-near zero current. A levitation coil spends most of its time near zero.
+The board cycles through these states thousands of times a second. What sets the average voltage
+across the coil is which states it cycles between, and how long it holds each one.
 
-The tradeoff is that the four transistors do not share the work evenly: two do most of it and
+There are two ways to pick that sequence:
+
+```
+locked antiphase   Q1+Q4 -> Q2+Q3 -> Q1+Q4 -> Q2+Q3    coil sees  +60 V, -60 V, +60 V, -60 V
+unipolar           Q1+Q4 -> Q1+Q3 -> Q1+Q4 -> Q1+Q3    coil sees  +60 V,   0 V, +60 V,   0 V
+```
+
+Antiphase only uses the top two rows of the table, so the coil gets slammed between +60 V and
+−60 V every cycle even when you want very little current out of it. Unipolar swaps one of those
+for a freewheel row, where both ends of the coil are held at the same voltage. Nothing is
+pushing the current any more, so it coasts around a loop through the two transistors and fades
+slowly, the way a bike wheel spins on after you stop pedalling. A switching cycle is far too
+short for it to fade much. That halves the voltage swing, and at low output the coil spends most
+of each cycle coasting.
+
+That keeps the current steadier and takes a lot of strain off the bus capacitors, which is what
+decided it. A levitation coil sits near zero most of the time, so low output is its normal
+operating point.
+
+The tradeoff is that the four transistors no longer share the work evenly. Two do most of it and
 run hot, two do very little and stay cool. They are arranged alternately on the heatsink so no
 two hot ones sit next to each other.
 
@@ -116,7 +133,10 @@ Three of them matter:
 - **A16**: the power traces are 10.7 mm wide. That figure comes from an older standard, and the
   project notes already say it should be rechecked against the current one.
 
-## Things I got wrong
+## Mistakes and what they changed
+
+Every one of these was caught before it reached a manufacturer, and each one changed how the
+work was checked afterwards.
 
 **Measured the wrong thing.** Six large capacitors were supposed to fit between the two coil
 connectors. Comparing the metal pads, they fit. Comparing the space each part actually needs
@@ -141,16 +161,17 @@ on to layout.
 ## Repository layout
 
 ```
-final_lev.kicad_*        KiCad project and its custom design rules
-lib.pretty/              custom connector footprint
-tools/lay.py             the layout checker
-docs/00                  running log, including the corrections
-docs/01                  every datasheet and app note used, each one checked
-docs/09                  component values and the assumption list
-docs/16                  38 review findings across three rounds
-docs/18                  what the control microcontroller has to send
-docs/20, docs/21         placement, layer stackup, routing order
-HANDOFF.md               where the project stands and what comes next
+final_lev.kicad_*                KiCad project and its custom design rules
+lib.pretty/                      custom connector footprint
+tools/lay.py                     the layout checker
+docs/00_design_log.md            running log, including the corrections
+docs/01_reference_library.md     every datasheet and app note used, each one checked
+docs/09_design_sheet_rev0.md     component values and the assumption list
+docs/16_adversarial_review.md    38 review findings across three rounds
+docs/18_firmware_interface.md    what the control microcontroller has to send
+docs/20_layout_phase.md          placement and the verified clearances
+docs/21_stackup_and_layers.md    layer stackup and routing order
+HANDOFF.md                       where the project stands and what comes next
 ```
 
 ## Not done

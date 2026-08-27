@@ -207,12 +207,14 @@ check, and writes nothing unless those agree with the predicted values. Dry run 
 
 ## 7. Moving the project between machines
 
-**Remote:** `origin` → `https://github.com/sebgle/final_lev.git` (private). Added 2026-08-24.
+**Remote:** `origin` → `https://github.com/sebgle/hyperloop-levitation-driver.git`. Added
+2026-08-24, renamed from `final_lev` the same day. GitHub redirects the old URL, but do not
+rely on that.
 
 On a new machine:
 
 ```powershell
-git clone https://github.com/sebgle/final_lev.git
+git clone https://github.com/sebgle/hyperloop-levitation-driver.git
 cd final_lev
 ```
 
