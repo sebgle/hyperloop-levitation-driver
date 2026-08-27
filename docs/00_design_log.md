@@ -1692,3 +1692,52 @@ set to Ignore with the reason recorded.
 Two claims were made and withdrawn along the way — "it must be the library" and "KiCad rewrote
 my patch, so the tool was unfaithful". Both are in §20.8. The method that settled it was the one
 that should have been used first: round-trip through the application and diff.
+
+---
+
+## 2026-08-24 (cont.) — the placement review, and one structural finding
+
+Placement had been signed off. It was signed off against six geometric checks, all of which
+passed while two current-sense amplifiers sat 38 and 62 mm from their only bypass capacitor. The
+prompt to look was a remark from outside the project about I/O filter capacitors. That is not a
+process, so the first move was to make it one: `lay.py` gained eight checks covering decoupling
+distance, filter placement, gate path, bootstrap, Kelvin matching, high-to-low-voltage approach,
+silkscreen collisions and test-point presence. Thresholds are named constants with the reasoning
+written above them.
+
+It reported **7 FAIL and 16 warn** on a board whose documentation said placement was complete.
+
+Then the eight functional blocks were walked one at a time rather than re-placing anything.
+Full record in `20_layout_phase.md` §20.9. Sixteen parts moved across two batches, both by
+self-checking tools, and the checks now read **1 FAIL and 10 warn** — the failure being the
+absence of test points, which needs schematic work rather than a move.
+
+**The finding that matters is not a part position.** §21.4 assigned the four 30 A coil pours to
+F.Cu. Mapping every clear vertical channel on that layer gives 5.80 mm below the bridge, 8.30 mm
+through the logic blocks, 2.43 mm below them, and **no continuous channel of any width** from
+the bridge to the coil connectors. A 10.7 mm pour has nowhere to go, and necking one to the
+widest 5.1 mm available puts a 68 °C rise at 30 A beside the sense amplifier.
+
+B.Cu is obstructed only by 72 through-hole pads and offers the full board width. The pours move
+there, paralleled onto F.Cu where a channel exists. §21.4 and §21.7 are amended.
+
+This would have surfaced about a third of the way into routing, after the gate loops and sense
+pairs were committed. Every check in this project measured distances between parts; this is
+about the space between them, which nothing looked at.
+
+**A pattern named.** Four separate findings across the review were one mistake: a block mirrored
+for CH2 where a single part kept CH1's geometry. The bridge ceramics, `C211`, `R238`, and the
+CH2 leg order that started all of this.
+
+**Two register corrections.** A11's hole pattern was 150 × 90 mm and the board has 150 × 130;
+the entry dated from before the board grew. A17 added for the shared bus section, which carries
+both channels at 60 A and needs 28.0 mm against the 10.7 mm everything else was sized for, and
+which is why In2.Cu cannot be used for signal routing.
+
+**Two smaller corrections.** §21.3's "224 mV below the LM2903B's common-mode ceiling" is the
+INA240's output headroom, not the comparator's input range; the comparator runs from 12 V. And
+the IR2184 link in `01_reference_library.md` resolves to an IR21844S file, which is a different
+part.
+
+**Still unmeasured: the coil.** Unchanged.
+

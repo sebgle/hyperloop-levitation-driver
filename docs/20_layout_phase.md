@@ -303,6 +303,90 @@ would have shown it was correct — reopen, save, diff — was not run at the ti
 
 ---
 
+## 20.9 Block-by-block placement review
+
+**2026-08-24.** Placement had been called complete and verified, and it was, on the six things
+`lay.py` measured. A remark from outside the project ("the filter capacitors for the I/O should
+be close to the pins") found a whole category the checker was blind to. Rather than re-place the
+board, the eight functional blocks were walked one at a time: what each is for, what the file
+measures, whether it meets the intent.
+
+`lay.py` was extended first with eight new checks, so the review's findings are reproducible
+rather than anecdotal. See the PLACEMENT CHECKS section of that script; its thresholds are named
+constants with the reasoning above them.
+
+### What each block came to
+
+| Block | Verdict |
+|---|---|
+| 1 bridge | Meets intent. Loops 12.9 / 16.7 mm, FET bodies flush on the heatsink face, thermal order preserved |
+| 2 gate drive | Meets intent. Loops 32.9 to 37.4 mm, channels matched within 0.4 mm, bootstrap 10.3 to 10.8 mm |
+| 3 current sense | One finding: `C211` on the wrong side of `U203` |
+| 4 protection | Six findings: every capacitor around both comparators |
+| 5 logic and MCU | One finding: `R238` |
+| 6 bus and bulk | No findings. Bulk bank within 1.9 mm of uniform. Two open questions |
+| 7 coil paths | **Structural.** The coil pours cannot go on F.Cu |
+| 8 mechanical | Sound. One stale register entry, A11 |
+
+### The pattern worth naming
+
+Four separate findings were the same underlying mistake: **a block mirrored for CH2 where one
+part kept CH1's geometry.** The bridge ceramics facing the wrong way (§20.8), `C211` left above
+a package that had been rotated 180°, `R238` translated with the block instead of mirrored with
+it, and the CH2 leg order itself (§20.4). Anything added to this board should be checked against
+that first.
+
+### Moves applied
+
+Eight parts, by `tools/place_caps.py`, from the decoupling failures:
+
+```
+C20  -> U3.6      58.17 mm -> 2.36      C213 -> U203.6   38.95 -> 2.34
+C1   -> U1.5       6.26    -> 2.76      C2   -> U1.5      4.31 -> 2.19
+C227 -> U206.5     6.26    -> 2.76      C228 -> U206.5    4.31 -> 2.19
+C209 -> J202.15   19.89    -> 2.37      C210 -> J202.16  28.60 -> 2.43
+```
+
+Eight more by `tools/place_review.py`, from the block walk:
+
+```
+C211 -> U203.8     7.05 mm -> 3.41      R238 -> U207.1   46.87 -> 26.57
+C25  -> U4.3       5.56    -> 2.39      C235 -> U204.3    5.56 -> 2.31
+C26  -> U4.6      12.78    -> 2.39      C237 -> U204.6   12.78 -> 2.31
+C27  -> U4.2      10.46    -> 2.62      C239 -> U204.2   10.46 -> 3.12
+```
+
+`lay.py` placement checks went **7 FAIL / 16 warn** to **1 FAIL / 10 warn**. The remaining
+failure is the absence of test points; the remaining warnings are supply pins in the 3.8 to
+5.3 mm band and the two `/RESET` time-constant capacitors, which the checker cannot distinguish
+from noise filters and therefore reports rather than grades.
+
+Courtyard overlaps stayed at 0 and the commutation loops stayed at 12.9 / 16.7 mm through both
+batches.
+
+### Things checked that turned out fine, recorded so nobody checks them twice
+
+- The 81 to 93 mm PWM runs from buffer to driver need no series termination. Round-trip delay
+  1.12 ns against a 2 ns edge; reflections settle inside the edge.
+- The 3.3 V buffers drive the IR2184 inputs with 0.6 V of margin. VIH is 2.7 V minimum and the
+  part is specified 3.3 V logic compatible.
+- The 45 mm shutdown run at 767 Ω picks up about 38 mV from a 0.5 V/ns neighbour through a
+  plausible 0.1 pF. Nowhere near a logic threshold.
+- All six bulk electrolytics share one polarity orientation, which is a deliberate assembly
+  safeguard.
+
+### Open, and belonging to somebody else
+
+The TVS clamps sit 70 mm from the bus connector and 53 mm from the bridge, and the bridge has no
+room for them: respecting the heatsink shadow and every courtyard, the closest either can get is
+27.5 and 37.2 mm. What they are for should be settled before spending a rearrangement on them.
+Separately, this board has no surge protection where the harness lands.
+
+Bleed timing, for anyone about to probe it: 62 second time constant, below 50 V in 11 seconds,
+below 5 V in two and a half minutes, 5.1 J stored at 60 V.
+
+---
+
 ## 20.7 Open after this phase
 
 | Item | Note |

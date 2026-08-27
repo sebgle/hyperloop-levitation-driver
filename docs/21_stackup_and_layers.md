@@ -89,7 +89,7 @@ Loop inductance scales with that separation. This is the largest single benefit 
 as a side effect of the stackup the fab builds by default.
 
 **3. The current sense.** The protection scheme rests on a 0.5 mΩ shunt at 25 mV/A, amplified
-×50, compared against thresholds sitting 224 mV below the LM2903B's common-mode ceiling. That
+×50, compared against thresholds sitting 224 mV below the top of the INA240's output swing. That
 measurement must stay clean while 30 A commutates at ~0.5 V/ns centimetres away, and the
 ±45 A trip is the only thing between a fault and four destroyed FETs. A continuous plane under
 that differential pair is cheap insurance on the circuit whose failure costs the most.
@@ -121,7 +121,28 @@ budget turns out tight after the coil is measured.
 | **F.Cu** | 2 oz | Components, high-current pours, gate-drive loops |
 | **In1.Cu** | 1 oz | **Solid GND plane. No routing, ever.** Unbroken under the FET row and the sense pairs — this is the thing being bought |
 | **In2.Cu** | 1 oz | Paralleled high-current copper stitched to F.Cu, plus +60 V distribution |
-| **B.Cu** | 2 oz | Logic and signal routing, GND fill stitched to In1.Cu |
+| **B.Cu** | 2 oz | **The four 30 A coil pours**, plus logic and signal routing and GND fill stitched to In1.Cu. Amended 2026-08-24: see the note below |
+
+> **Amended 2026-08-24, and this is a real change.** The coil pours were assigned to F.Cu. They
+> cannot go there. Mapping every clear vertical channel on F.Cu, courtyards only, gives 5.80 mm
+> in the band below the bridge, 8.30 mm through the logic blocks, 2.43 mm below them, and **no
+> continuous channel of any width** from the bridge to the coil connectors. A 10.7 mm pour has
+> nowhere to run. Necking one to the widest available 5.1 mm puts a 68 °C rise at 30 A right
+> next to the current-sense amplifier.
+>
+> B.Cu is obstructed only by through-hole pads, 72 of them, and offers the full 159 mm width in
+> both bands above the bulk row. The coil pours belong there, dropping through vias just after
+> each shunt and landing at the connector, paralleled onto F.Cu wherever a channel exists. At
+> 15 A per layer a 5.1 mm F.Cu run is only a 14.1 °C rise.
+>
+> In1.Cu then sits between the B.Cu coil currents and the F.Cu circuitry, shielding the sense
+> amplifiers and comparators from 30 A passing underneath. That is a benefit of four layers
+> nobody had articulated.
+>
+> Consequence: B.Cu logic gets routed **around** the pours, not the other way round. Signal
+> demand is 3,126 mm of connection length, 5.6 % of one layer, against roughly 19 % for the
+> pours, so there is room. The ordering has to be respected.
+
 
 Target stackup, 1.60 mm total:
 
@@ -200,11 +221,16 @@ that merely need to arrive get routed around them.
 1. **Commutation loops** — bridge ceramics to FET drains and sources. Shortest, fattest, on
    F.Cu. Everything else routes around these.
 2. **Gate loops** — gate and return as a tight pair per FET, over In1.Cu. These decide whether
-   the FETs switch cleanly.
+   the FETs switch cleanly. The **low side** returns through the ground plane and closes its own
+   loop. The **high side** returns through VS, a routed net on a node slewing at 0.5 V/ns, so HO
+   and VS must be drawn as a deliberate pair or the loop area becomes whatever the router chose.
 3. **Sense pairs** — Kelvin connections from the shunts to the INA240s, over unbroken plane,
    no crossings.
-4. **High-current pours** — coil and bus zones on F.Cu, paralleled on In2.Cu, 20 vias per
-   transition.
+4. **High-current pours** — **coil pours on B.Cu**, paralleled onto F.Cu where a channel
+   exists, 20 vias per transition. The +60 V bus zone on F.Cu paralleled onto In2.Cu.
+   See the amendment in §21.4: F.Cu has no continuous channel wide enough for a coil pour.
 5. **Bulk to bridge** — the ~81 mm feed.
-6. **Logic and signals** on B.Cu.
+6. **Logic and signals** on B.Cu, routed around the coil pours. `SD` is the fault shutdown
+   line, sits at 767 Ω, and runs 45 mm past the bridge: keep it over the plane and away from any
+   switching node.
 7. **GND fill and stitching**, then DRC.

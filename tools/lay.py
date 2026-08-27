@@ -96,6 +96,7 @@ def parse(apply_swap=False):
             x += SHIFT[ref]
         fpn = re.match(r'\(footprint "([^"]+)"', b)
         pads = {}
+        padinfo = {}
         for pm in re.finditer(r'\(pad "([^"]+)"((?:.|\n)*?)\n\t\t\)', b):
             pn, pb = pm.group(1), pm.group(2)
             pa = re.search(r'\(at ([-\d.]+) ([-\d.]+)', pb)
@@ -105,7 +106,22 @@ def parse(apply_swap=False):
             pads[pn] = ((x + lx * math.cos(a) - ly * math.sin(a),
                          y + lx * math.sin(a) + ly * math.cos(a)),
                         nt.group(1) if nt else None)
+            pt = re.search(r'\(pintype "([^"]+)"', pb)
+            pf = re.search(r'\(pinfunction "([^"]+)"', pb)
+            padinfo[pn] = {'pintype': pt.group(1) if pt else '',
+                           'fn': pf.group(1) if pf else ''}
+        vm = re.search(r'\(property "Value" "([^"]*)"', b)
+        rt = re.search(r'\(property "Reference" "[^"]+"\s*\(at '
+                       r'([-\d.]+) ([-\d.]+)', b)
+        rtxy = None
+        if rt:
+            ra = math.radians(-ang)
+            rlx, rly = float(rt.group(1)), float(rt.group(2))
+            rtxy = (x + rlx * math.cos(ra) - rly * math.sin(ra),
+                    y + rlx * math.sin(ra) + rly * math.cos(ra))
         F[ref] = {'x': x, 'y': y, 'ang': ang, 'pads': pads,
+                  'padinfo': padinfo, 'val': vm.group(1) if vm else '',
+                  'reftext': rtxy,
                   'c': crt(b, x, y, ang), 'fpn': fpn.group(1) if fpn else ''}
     return F
 
@@ -247,9 +263,260 @@ def window_check(F):
         print('     missing: %s' % (sorted(set(G) - set(got)) or 'none'))
 
 
+
+
+# =====================================================================
+# PLACEMENT CHECKS -- added 2026-08-24
+#
+# WHY THESE EXIST: every check above is geometric (overlaps, loops,
+# clearances) and all of them passed while two current-sense amplifiers
+# sat 38 and 62 mm from their only bypass capacitor. A checker finds what
+# somebody thought to check, so these encode the rest of the pre-routing
+# review as measurements rather than memory.
+#
+# Thresholds are stated here, not implied. Change them here and every
+# number in the project's documents moves with them.
+# =====================================================================
+
+DECOUPLE_OK = 3.0        # mm, IC supply pin to nearest capacitor on that rail
+DECOUPLE_FAIL = 6.0
+FILTER_OK = 5.0          # mm, filter capacitor to the pin it filters
+FILTER_FAIL = 15.0
+CHANNEL_SKEW = 1.0       # mm, tolerated CH1/CH2 mismatch on mirrored measurements
+RAILS = ('+12V', '+5V', '+3.3V')
+
+_R = []
+
+
+def _say(sev, text):
+    _R.append((sev, text))
+    print('  %-5s %s' % (sev, text))
+
+
+def _d(a, b):
+    return math.hypot(a[0] - b[0], a[1] - b[1])
+
+
+def padlist(F):
+    out = []
+    for ref, d in F.items():
+        for pn, (p, nm) in d['pads'].items():
+            info = d.get('padinfo', {}).get(pn, {})
+            out.append({'ref': ref, 'pad': pn, 'net': nm, 'xy': p,
+                        'pintype': info.get('pintype', ''),
+                        'fn': info.get('fn', '')})
+    return out
+
+
+def by_net(P):
+    n = {}
+    for p in P:
+        if p['net']:
+            n.setdefault(p['net'], []).append(p)
+    return n
+
+
+def nets_of(P, ref):
+    return {p['net'] for p in P if p['ref'] == ref}
+
+
+def check_decoupling(F, P, N):
+    print('\ndecoupling -- IC supply pin to nearest capacitor on the same rail')
+    worst = 0.0
+    for p in P:
+        if p['pintype'] != 'power_in' or p['net'] not in RAILS:
+            continue
+        cands = [q for q in N.get(p['net'], [])
+                 if q['ref'].startswith('C') and 'GND' in nets_of(P, q['ref'])]
+        if not cands:
+            _say('FAIL', '%s.%s [%s] has no capacitor anywhere on its rail'
+                 % (p['ref'], p['pad'], p['net']))
+            continue
+        b = min(cands, key=lambda q: _d(p['xy'], q['xy']))
+        dist = _d(p['xy'], b['xy'])
+        worst = max(worst, dist)
+        sev = ('ok' if dist <= DECOUPLE_OK
+               else 'warn' if dist < DECOUPLE_FAIL else 'FAIL')
+        if sev != 'ok':
+            _say(sev, '%s.%s [%s] nearest cap %s at %.2f mm'
+                 % (p['ref'], p['pad'], p['net'], b['ref'], dist))
+    print('  worst supply-pin distance %.2f mm   (ok <= %.1f, fail >= %.1f)'
+          % (worst, DECOUPLE_OK, DECOUPLE_FAIL))
+
+
+def check_filters(F, P, N):
+    print('\nfilter capacitors -- cap to the nearest IC or connector pin it filters')
+    print('  connector pins are graded strictly. Everything else is reported')
+    print('  only: this check cannot tell an RF filter from an RC time constant')
+    seen = set()
+    for p in sorted(P, key=lambda q: q['ref']):
+        if not p['ref'].startswith('C') or not p['net'] or p['net'] == 'GND':
+            continue
+        if p['ref'] in seen:
+            continue
+        nets = nets_of(P, p['ref'])
+        if 'GND' not in nets or (nets & set(RAILS)) or '+60V' in nets:
+            continue
+        # Measure to the nearest IC or connector pin on the net, i.e. the
+        # thing being filtered. Series resistors are expected to sit next to
+        # the cap, and a net can legitimately span the board (/RESET reaches
+        # both channels), so 'furthest pin on the net' gives false alarms.
+        others = [q for q in N[p['net']] if q['ref'] != p['ref']
+                  and (q['ref'][0] in 'UJ')]
+        if not others:
+            continue
+        seen.add(p['ref'])
+        far = min(others, key=lambda q: _d(p['xy'], q['xy']))
+        dist = _d(p['xy'], far['xy'])
+        strict = far['ref'].startswith('J')      # an I/O filter belongs at the pin
+        if dist <= FILTER_OK:
+            sev = 'ok'
+        elif strict and dist >= FILTER_FAIL:
+            sev = 'FAIL'
+        else:
+            sev = 'warn'
+        if sev != 'ok':
+            _say(sev, '%s on %s is %.2f mm from %s.%s%s'
+                 % (p['ref'], p['net'], dist, far['ref'], far['pad'],
+                    '  [connector]' if strict else ''))
+
+
+def check_gate_paths(F, P, N):
+    print('\ngate path -- driver output pin, series resistor, FET gate')
+    res = {}
+    for gnet in sorted(n for n in N if '/G_Q' in n):
+        gp = [p for p in N[gnet] if p['ref'].startswith('Q')]
+        rs = [p for p in N[gnet] if p['ref'].startswith('R')]
+        if not (gp and rs):
+            continue
+        r = min(rs, key=lambda p: _d(p['xy'], gp[0]['xy']))
+        seg2 = _d(r['xy'], gp[0]['xy'])
+        seg1 = None
+        for o in [q for q in P if q['ref'] == r['ref'] and q['pad'] != r['pad']]:
+            drv = [q for q in N.get(o['net'], []) if q['ref'].startswith('U')]
+            if drv:
+                seg1 = min(_d(o['xy'], q['xy']) for q in drv)
+        if seg1 is None:
+            continue
+        res[gnet] = seg1 + seg2
+        print('  %-14s %5.2f mm' % (gnet, res[gnet]))
+    _mirror(res, 'gate path')
+
+
+def check_bootstrap(F, P, N):
+    print('\nbootstrap capacitor to driver VB pin')
+    res = {}
+    for net in sorted(n for n in N if 'VB_' in n):
+        cap = [p for p in N[net] if p['ref'].startswith('C')]
+        drv = [p for p in N[net] if p['ref'].startswith('U')]
+        if not (cap and drv):
+            continue
+        res[net] = min(_d(a['xy'], b['xy']) for a in cap for b in drv)
+        print('  %-14s %5.2f mm' % (net, res[net]))
+    _mirror(res, 'bootstrap')
+
+
+def check_sense(F, P, N):
+    print('\nshunt Kelvin pads to amplifier inputs')
+    for ch, sh, amp in (('CH1', 'R11', 'U3'), ('CH2', 'R219', 'U203')):
+        if sh not in F or amp not in F:
+            continue
+        try:
+            pp = _d(F[sh]['pads']['2'][0], F[amp]['pads']['8'][0])
+            nn = _d(F[sh]['pads']['3'][0], F[amp]['pads']['1'][0])
+        except KeyError:
+            continue
+        print('  %s   P %6.2f mm   N %6.2f mm   mismatch %.2f mm'
+              % (ch, pp, nn, abs(pp - nn)))
+
+
+def check_hv_lv(F, P, N):
+    print('\nclosest approach, 60 V nets to logic nets')
+    hv = set(['+60V']) | set(n for n in N if 'SW_' in n or 'COIL_' in n
+                             or 'VB_' in n)
+    lv = set(n for n in N if n not in hv and n != 'GND')
+    best = None
+    for h in hv:
+        for p in N[h]:
+            for l in lv:
+                for q in N[l]:
+                    if q['ref'] == p['ref']:
+                        continue      # pins inside one package: the vendor's problem
+                    dd = _d(p['xy'], q['xy'])
+                    if best is None or dd < best[0]:
+                        best = (dd, '%s.%s[%s]' % (p['ref'], p['pad'], h),
+                                '%s.%s[%s]' % (q['ref'], q['pad'], l))
+    if best:
+        print('  %.2f mm   %s  <->  %s' % best)
+        if best[0] < 0.6:
+            _say('FAIL', 'below the IPC-2221 uncoated minimum of 0.6 mm at 51-100 V')
+
+
+def check_silk(F):
+    print('\nsilkscreen reference designator collisions')
+    T = [(r, d['reftext'][0], d['reftext'][1], len(r) * 0.75, 1.0)
+         for r, d in F.items() if d.get('reftext')]
+    n = 0
+    for i in range(len(T)):
+        for j in range(i + 1, len(T)):
+            a, b = T[i], T[j]
+            if (abs(a[1] - b[1]) < (a[3] + b[3]) / 2
+                    and abs(a[2] - b[2]) < (a[4] + b[4]) / 2):
+                n += 1
+                if n <= 6:
+                    _say('warn', '%s and %s reference text overlap' % (a[0], b[0]))
+    print('  overlapping pairs: %d' % n)
+
+
+def check_testpoints(F):
+    print('\ntest points')
+    tp = [r for r, d in F.items() if 'TestPoint' in d['fpn'] or r.startswith('TP')]
+    if tp:
+        print('  %d found: %s' % (len(tp), ' '.join(sorted(tp))))
+    else:
+        _say('FAIL', 'no test points. A 60 V / 30 A prototype needs somewhere '
+                     'to put a probe, and adding them after routing means '
+                     'ripping up copper')
+
+
+def _mirror(res, label):
+    """CH1 and CH2 are mirrored, so matching measurements should agree."""
+    pairs = {}
+    for k, v in res.items():
+        key = k.replace('/CH1/', '').replace('/CH2/', '')
+        pairs.setdefault(key, {})['CH1' if '/CH1/' in k else 'CH2'] = v
+    for k, v in sorted(pairs.items()):
+        if len(v) == 2 and abs(v['CH1'] - v['CH2']) > CHANNEL_SKEW:
+            _say('warn', '%s %s differs between channels: %.2f vs %.2f mm'
+                 % (label, k, v['CH1'], v['CH2']))
+
+
+def checks(F):
+    print('\n' + '=' * 62)
+    print('PLACEMENT CHECKS')
+    print('=' * 62)
+    del _R[:]
+    P = padlist(F)
+    N = by_net(P)
+    check_decoupling(F, P, N)
+    check_filters(F, P, N)
+    check_gate_paths(F, P, N)
+    check_bootstrap(F, P, N)
+    check_sense(F, P, N)
+    check_hv_lv(F, P, N)
+    check_silk(F)
+    check_testpoints(F)
+    fails = sum(1 for s, _ in _R if s == 'FAIL')
+    warns = sum(1 for s, _ in _R if s == 'warn')
+    print('\n' + '-' * 62)
+    print('PLACEMENT CHECKS: %d FAIL, %d warn' % (fails, warns))
+    print('-' * 62)
+    return fails
+
 if __name__ == '__main__':
     B = parse(False)
     report(B, 'CURRENT BOARD')
+    checks(B)
     # The CH2 leg A/B swap was APPLIED 2026-08-22 (commit c9f1e50).
     # leg_audit() and window_check() described the board BEFORE that edit, and
     # parse(True) would shift the legs a SECOND time -- 26 courtyard overlaps
