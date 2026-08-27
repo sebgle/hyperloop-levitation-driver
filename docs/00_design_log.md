@@ -1662,3 +1662,33 @@ for — +60 V on F.Cu, GND returning through the In1.Cu plane directly beneath i
 designed.
 
 **Still unmeasured: the coil.** Unchanged.
+
+---
+
+## 2026-08-24 (cont.) — In1.Cu plane; a warning chased to ground
+
+**The In1.Cu ground plane is in.** One zone, whole board (100,50)–(260,190), net GND, pad
+connection **Solid**, filled edge landing at 100.5 / 259.4995 where the 0.5 mm edge-clearance
+rule put it. Solid rather than thermal relief is not a preference: the low-side FET sources are
+where the whole 30 A leg current enters the plane, IPC-2221 internal wants **55.9 mm** of 1 oz
+copper for 30 A at ΔT = 20 °C, and four 0.5 mm spokes provide 2 mm. Twenty-eight times short.
+The cost is that those TO-220 source pins will be hard to hand-solder.
+
+**DRC unconnected fell 393 → 374, which is exactly right.** 492 pads across 99 nets gives 393
+ratsnest connections with nothing routed. An inner plane can only reach through-hole pads, and
+`GND` has exactly 20 of those — four FET sources, the bulk cans, and six connector pins — so
+they merge into one group and the count drops by 19. The other **99 SMD GND pads are
+electrically untouched by the plane** until each has a via. Predicted before the number was
+read, and KiCad’s own report agreed.
+
+**Ten `lib_footprint_mismatch` warnings, chased to the end.** Full record in
+`20_layout_phase.md` §20.8. The flagged list was exactly the ten rotated ceramics, which looked
+like proof the file patch had done something the GUI would not. Redoing the rotation in the GUI
+left the footprint blocks **byte-identical** and the warnings in place. Geometry was then
+compared against this machine’s own library file as parsed S-expressions: pads, courtyard,
+fab rect, silk lines, attr and model path all identical. Cosmetic, cause not isolated, severity
+set to Ignore with the reason recorded.
+
+Two claims were made and withdrawn along the way — "it must be the library" and "KiCad rewrote
+my patch, so the tool was unfaithful". Both are in §20.8. The method that settled it was the one
+that should have been used first: round-trip through the application and diff.

@@ -261,6 +261,48 @@ and writes nothing unless those agree. The numbers it prints are the ones it com
 
 ---
 
+
+### The library-mismatch warning it produced, and what that turned out to be
+
+After the rotation, DRC reported ten `lib_footprint_mismatch` warnings, and the flagged list was
+exactly the ten rotated parts: C3, C5, C6, C7, C8, C212, C214, C215, C216, C217. None of the
+untouched 1210s — C12–C15, C219–C222 — appeared.
+
+That looked conclusive, and it was wrong. The rotation was redone in the KiCad GUI (Orientation
+0 → save → Orientation 180 → save) and the ten warnings persisted. Diffing each footprint block
+before and after that GUI round trip: **identical, to the byte.**
+
+So the file patch and the editor converge on the same board. The warning is not an artefact of
+external editing — it is what KiCad 10 reports for these capacitor footprints at 180°, and it
+would have appeared identically had the rotation been done by hand from the start.
+
+The geometry was verified against the actual library file from this machine
+(`Capacitor_SMD/C_1210_3225Metric_Pad1.33x2.70mm_HandSolder.kicad_mod`, same `(version
+20260206)` as the board). Compared as parsed S-expressions rather than as text, the only
+differences are the board placement coordinates and the Reference text offset — and C13, which
+differs from the library in *both* Reference offset values and is **not** flagged, rules that
+out as the trigger. Pads, courtyard rect, F.Fab rect, both silk lines, `attr` and the 3D model
+path are identical.
+
+**Conclusion: cosmetic, cause not isolated, geometry confirmed identical.** Severity set to
+Ignore, with this note as the reason. What must *not* be done is **Update Footprints from
+Library** — it would replace the board footprints wholesale, and every clearance and loop figure
+in this document is measured from that geometry.
+
+### A correction, and then a correction to the correction
+
+This section first claimed the tool "reproduces exactly what the KiCad GUI writes". That was
+retracted when KiCad was seen rewriting the patched text-field offsets on save — `(at 0 2.5
+180)` came back as `(at 0 -2.5 180)`. The retraction was itself too broad: KiCad normalises
+those offsets on load, and after one save cycle the file is byte-identical to the GUI result.
+Both statements stay on the record because both were made.
+
+The durable lesson is narrower than "don’t patch files": **a claim about file format is worth
+only what a round trip through the application proves.** The patch was correct. The check that
+would have shown it was correct — reopen, save, diff — was not run at the time.
+
+---
+
 ## 20.7 Open after this phase
 
 | Item | Note |

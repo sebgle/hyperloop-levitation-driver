@@ -153,3 +153,28 @@ protection.
 2. **The 32 V MIDI fuse that dominates search results is not rated for a 60 V DC bus.**
    The overview document's fuse selection needs revisiting on voltage rating, separately
    from the current-rating problem already noted.
+
+---
+
+## 8. PCB layout — the switching power loop
+
+**Added 2026-08-24**, during layout, when `21_stackup_and_layers.md` §21.7 step 1
+("commutation loops … on F.Cu") turned out not to be routable as written.
+
+| Document | What it solves | Read |
+|---|---|---|
+| **SNVA803** *Improve High-Current DC/DC Regulator EMI Performance for Free With Optimized Power Stage Layout* (Timothy Hegarty, TI, September 2019) · [PDF](https://www.ti.com/lit/an/snva803/snva803.pdf) | The **vertical vs lateral power loop** — the decision behind returning bridge GND through the In1.Cu plane rather than running it beside the +60 V copper on F.Cu. | The vertical construction: layer 2 used as the power-loop return directly beneath the top layer, so the opposing currents give **field self-cancellation**. Quantified: switching loop area **2 mm² against almost 20 mm²**, parasitic loop inductance **below 500 pH against more than 1 nH**, and roughly **4 V** less switch-node overshoot. |
+
+**Caveat, stated:** SNVA803 is written for a synchronous buck. Each leg of this H-bridge is a
+half-bridge with the same commutation loop — high-side drain, low-side source, and the ceramics
+across the bus — so the loop argument transfers directly. What does **not** transfer is anything
+in it about the output inductor, the feedback network, or the IC-integrated power stage; this
+board uses discrete TO-220s on a heatsink, which is a physically larger loop than the paper
+assumes. Treat its 2 mm² as the direction, not the target.
+
+> **Unresolved tension with §6.** The 10.7 mm pour width and the 10.7 mm `HV_POWER` DRC rule
+> are both derived from **IPC-2221**, and §6 above already records that the IPC-2221 chart is
+> effectively a free-air conductor and that these numbers should be re-derived against
+> **IPC-2152**. That re-derivation has not been done. It is the same class of error as the
+> unmeasured coil: a number in daily use resting on a source the project has already
+> questioned in writing.

@@ -207,26 +207,21 @@ check, and writes nothing unless those agree with the predicted values. Dry run 
 
 ## 7. Moving the project between machines
 
-**This repository has no git remote.** Options, in order of preference:
+**Remote:** `origin` → `https://github.com/sebgle/final_lev.git` (private). Added 2026-08-24.
 
-1. **Add a remote** (GitHub/GitLab, private), then `git push -u origin master`. Best — real sync
-   rather than one-shot copies, which matters now that two machines are in play.
-2. **`git bundle`** — one file carrying the entire history:
-   ```powershell
-   git bundle create ..\final_lev.bundle --all
-   ```
-   To restore:
-   ```powershell
-   git clone .\final_lev.bundle final_lev
-   cd final_lev
-   git remote remove origin
-   ```
-   Do **not** join those with `&&` — Windows PowerShell 5.1 does not support it. Use separate
-   lines, or `;` between them.
-3. **Copy the folder.** `.gitignore` excludes `.history/`, `_old/`, `_to_delete/` and KiCad local
-   files. **`lib.pretty/` must travel** — it holds the custom Molex 38969-0002 footprint
-   (`389690002.kicad_mod`, registered as `lev_lib` via `fp-lib-table`). Without it the board will
-   not open cleanly.
+On a new machine:
+
+```powershell
+git clone https://github.com/sebgle/final_lev.git
+cd final_lev
+```
+
+**`lib.pretty/` must travel** — it holds the custom Molex 38969-0002 footprint
+(`389690002.kicad_mod`, registered as `lev_lib` via `fp-lib-table`). It is tracked in the repo;
+confirm with `git ls-files lib.pretty` if a clone ever opens with a missing footprint.
+
+`.gitignore` excludes `.history/`, `_old/`, `_to_delete/`, `*.bak` and KiCad local files, so a
+clone is clean but carries none of the local backups.
 
 Note: **git writes fail through the Cowork device bridge** — the mount forbids deletion, so
 `.git` lock files persist. Run git from a normal Windows terminal.
