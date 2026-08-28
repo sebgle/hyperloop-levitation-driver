@@ -1,10 +1,26 @@
 (version 1)
 
-# 30 A nets are copper pour, not track.
-# IPC-2221 external, 2 oz, 30 A -> 10.7 mm at dT=20 C. 3.0 mm would be ~160 C.
-(rule "HV_POWER conductors must be sized for 30 A"
-	(constraint track_width (min 10.7mm))
-	(condition "A.hasNetclass('HV_POWER')"))
+# WHY THE 30 A WIDTH RULE IS NO LONGER HERE
+#
+# It used to say:
+#     (constraint track_width (min 10.7mm))  on A.hasNetclass('HV_POWER')
+# meaning "a 30 A conductor must be sized for 30 A". It could not do that job.
+#
+# HV_POWER matches +60V, GND, *SW_*, *COIL_* and *VB*. Every one of those nets
+# also carries signal-level connections: a bootstrap capacitor to a driver VS
+# pin, a gate-source resistor, a logic ground return. The rule demanded 10.7 mm
+# of copper for all of them. It is what forced the router to a 10.7 mm track
+# that could not fit between the board edge and its neighbour, and it would have
+# fired on every GND track on the board the moment signal routing started.
+#
+# The thing it was trying to protect is pour width, and DRC cannot see pour
+# width -- a zone is not a track. tools/pour_check.py measures it directly:
+# it rasterises each outline at 0.05 mm and reports the narrowest cut across the
+# conductor with the IPC-2221 rise that width implies at 30 A. As of 2026-08-27
+# the four coil pours measure 10.70 to 11.00 mm, 19 to 20 C.
+#
+# So the check moved to where it can actually be performed. Run pour_check.py
+# after any pour edit; DRC will not catch a narrow pour for you.
 
 # docs/21 section 21.4: In1.Cu is a solid GND plane, no routing, ever.
 # Vias must still pass through it, so only tracks are disallowed.
