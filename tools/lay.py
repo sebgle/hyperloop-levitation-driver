@@ -468,6 +468,150 @@ def check_silk(F):
     print('  overlapping pairs: %d' % n)
 
 
+def check_pad_orientation():
+    """Pads must be turned the same way as the footprint they belong to.
+
+    A pad's (at x y angle) in this file is the pad's ABSOLUTE angle, so a body
+    rotated to 90 normally has its pads written at 90. The quantity that must
+    hold constant is the DIFFERENCE, pad angle minus body angle, because some
+    library footprints legitimately define a pad already turned: KiCad's
+    Diode_SMD:D_SMC_Handsoldering declares its pads 90 off its own outline, and
+    D2 and D205 inherit that honestly.
+
+    So the baseline is not zero, it is whatever the other placements of the same
+    library footprint use. A script that rewrites a footprint's (at) line and
+    leaves the pads behind shows up as one instance disagreeing with its own
+    library id. That is exactly how C1, C20, C227, C213 and C239 were found:
+    5 parts turned 90 out of a population that was otherwise 0.
+
+    Off by 180 a rectangle is unchanged, so that is graded a warning. Off by 90
+    the pad's length and width swap and the copper stops matching the part's
+    terminations, which is a fabrication defect. No DRC on this board reported
+    either one.
+    """
+    print('\npad rotation vs footprint rotation')
+
+    def n(a):
+        return round(((a % 360) + 360) % 360, 3)
+
+    seen = {}
+    for m in re.finditer(r'\(footprint ((?:.|\n)*?)\n\t\)\n', s):
+        b = m.group(0)
+        rm = re.search(r'\(property "Reference" "([^"]+)"', b)
+        at = re.search(r'\n\t\t\(at ([-\d.]+) ([-\d.]+)(?: ([-\d.]+))?\)', b)
+        fp = re.match(r'\(footprint "([^"]+)"', b)
+        if not (rm and at and fp):
+            continue
+        fa = n(float(at.group(3) or 0))
+        for pm in re.finditer(r'\(pad "([^"]+)" \w+ [\w_]+\n\t\t\t'
+                              r'\(at ([-\d.]+) ([-\d.]+)(?: ([-\d.]+))?\)\n\t\t\t'
+                              r'\(size ([\d.]+) ([\d.]+)\)', b):
+            key = (fp.group(1), pm.group(1))
+            rel = n(float(pm.group(4) or 0) - fa)
+            seen.setdefault(key, []).append(
+                (rm.group(1), fa, rel, float(pm.group(5)), float(pm.group(6))))
+
+    odd = {}
+    for key, rows in seen.items():
+        counts = {}
+        for _, _, rel, _, _ in rows:
+            counts[rel] = counts.get(rel, 0) + 1
+        base = max(counts, key=lambda r: (counts[r], -r))
+        if counts[base] == len(rows):
+            continue
+        for ref, fa, rel, sw, sh in rows:
+            if rel == base:
+                continue
+            off = n(rel - base)
+            square = abs(sw - sh) < 1e-9
+            sev = 2 if (off in (90.0, 270.0) and not square) else 1
+            prev = odd.get(ref)
+            if prev is None or sev > prev[0]:
+                odd[ref] = (sev, fa, off, sw, sh, key[0], base, counts[base], len(rows))
+
+    for ref in sorted(odd, key=lambda r: (-odd[r][0], r)):
+        sev, fa, off, sw, sh, fpn, base, nbase, ntot = odd[ref]
+        where = ('%s, %d of %d placements sit at %g'
+                 % (fpn.split(':')[-1], nbase, ntot, base))
+        if sev == 2:
+            _say('FAIL', '%s body at %g deg has pads %g deg off its own library '
+                         'baseline: the %.3f x %.3f mm pad is turned across the '
+                         'part instead of along it (%s)'
+                 % (ref, fa, off, sw, sh, where))
+        else:
+            _say('warn', '%s body at %g deg has pads %g deg off its own library '
+                         'baseline. Same rectangle, so shape is unaffected (%s)'
+                 % (ref, fa, off, where))
+    if not odd:
+        print('  every footprint agrees with the other placements of its own '
+              'library footprint. 0 mismatched')
+
+
+def check_zones():
+    """Overlapping copper zones need distinct priorities, same net or not.
+
+    KiCad raises zones_intersect for any two zones that overlap on a layer and
+    share a priority. This checker reported 0 FAIL on a board carrying four of
+    them, because it had nothing to say about zones at all. Now it does.
+
+    Blocks are found by counting brackets, not by a lazy regex: '\n\t)' appears
+    inside a zone at the end of connect_pads, so a non-greedy match ends the
+    block early and silently loses zones. That mistake has cost this project
+    three wrong answers already.
+
+    Overlap is tested on bounding boxes. Every zone here is a rectangle, so that
+    is exact; it would over-report on an L-shaped outline.
+    """
+    print('\nzone overlap and priority')
+    lines = s.split('\n')
+    Z, start, depth = [], None, 0
+    for i, ln in enumerate(lines):
+        if start is None and ln.startswith('\t(zone'):
+            start, depth = i, 0
+        if start is not None:
+            depth += ln.count('(') - ln.count(')')
+            if depth <= 0 and i >= start:
+                b = '\n'.join(lines[start:i + 1])
+                nm = re.search(r'\(name "([^"]*)"', b)
+                ly = re.search(r'\(layer "([^"]*)"', b)
+                nt = re.search(r'\(net "([^"]*)"', b)
+                pr = re.search(r'\(priority (\d+)\)', b)
+                pm = re.search(r'\(polygon\n\t\t\t\(pts\n((?:.|\n)*?)\n\t\t\t\)', b)
+                pts = re.findall(r'\(xy ([-\d.]+) ([-\d.]+)\)', pm.group(1)) if pm else []
+                if pts:
+                    xs = [float(a) for a, _ in pts]
+                    ys = [float(c) for _, c in pts]
+                    Z.append({'name': nm.group(1) if nm else '?',
+                              'layer': ly.group(1) if ly else '?',
+                              'net': nt.group(1) if nt else '?',
+                              'pri': int(pr.group(1)) if pr else 0,
+                              'bb': (min(xs), max(xs), min(ys), max(ys))})
+                start = None
+    if not Z:
+        _say('FAIL', 'no zones parsed. The board has copper pours, so this is a '
+                     'parser failure, not an empty board')
+        return
+    for z in sorted(Z, key=lambda z: (z['layer'], z['name'])):
+        print('  %-14s %-7s %-10s priority %d   %.1f x %.1f mm'
+              % (z['name'], z['layer'], z['net'], z['pri'],
+                 z['bb'][1] - z['bb'][0], z['bb'][3] - z['bb'][2]))
+    n = 0
+    for i in range(len(Z)):
+        for j in range(i + 1, len(Z)):
+            a, b = Z[i], Z[j]
+            if a['layer'] != b['layer']:
+                continue
+            if not (min(a['bb'][1], b['bb'][1]) - max(a['bb'][0], b['bb'][0]) > 1e-9
+                    and min(a['bb'][3], b['bb'][3]) - max(a['bb'][2], b['bb'][2]) > 1e-9):
+                continue
+            if a['pri'] == b['pri']:
+                n += 1
+                _say('FAIL', '%s and %s overlap on %s and both sit at priority %d. '
+                             'KiCad calls this zones_intersect'
+                     % (a['name'], b['name'], a['layer'], a['pri']))
+    print('  %d zones, %d same-priority overlaps' % (len(Z), n))
+
+
 def check_testpoints(F):
     print('\ntest points')
     tp = [r for r, d in F.items() if 'TestPoint' in d['fpn'] or r.startswith('TP')]
@@ -505,6 +649,8 @@ def checks(F):
     check_sense(F, P, N)
     check_hv_lv(F, P, N)
     check_silk(F)
+    check_pad_orientation()
+    check_zones()
     check_testpoints(F)
     fails = sum(1 for s, _ in _R if s == 'FAIL')
     warns = sum(1 for s, _ in _R if s == 'warn')

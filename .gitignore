@@ -5,6 +5,9 @@
 _autosave-*
 fp-info-cache
 *.bak
+# numbered backups: every pour tool writes .bak1, .bak2, ... and '*.bak'
+# does not match those. Three of them nearly went into the repo.
+*.bak[0-9]*
 *-bak
 *.kicad_sch-bak
 *.kicad_pcb-bak

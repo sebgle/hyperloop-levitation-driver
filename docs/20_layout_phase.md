@@ -204,6 +204,12 @@ Both inside, zero courtyard overlaps board-wide.
 
 ## 20.8 Leg-A bridge ceramic orientation
 
+> **Superseded 2026-08-27 by 20.11.** The conclusion reached in this section, that the
+> `lib_footprint_mismatch` warnings were unexplained and safe to ignore, was wrong. The
+> warning was correct and the cause is isolated in 20.11. Everything else in this section
+> stands. It is left in place because the reasoning that produced the wrong call is the
+> point of keeping it.
+
 Found 2026-08-24 while laying out the CH1 leg A commutation loop, before any copper was
 placed.
 
@@ -384,6 +390,169 @@ Separately, this board has no surge protection where the harness lands.
 
 Bleed timing, for anyone about to probe it: 62 second time constant, below 50 V in 11 seconds,
 below 5 V in two and a half minutes, 5.1 J stored at 60 V.
+
+---
+
+## 20.10 Test points
+
+Thirteen test points were added to the schematic and placed on 2026-08-27. Before this the
+board had nowhere to put a probe, and adding probe points after routing means ripping up
+copper to make room for them.
+
+| Ref | Net | Why it is there |
+|---|---|---|
+| TP201 / TP202 | `/ISNS1`, `/ISNS2` | The amplifier output. This is the one signal that has to be believed, because the overcurrent trip is derived from it. |
+| TP203 / TP204 | `/CH1/SD`, `/CH2/SD` | Shutdown. Tells you whether the driver was commanded off or fell over on its own. |
+| TP205 / TP206 | `/CH1/FAULT_N`, `/CH2/FAULT_N` | The latch output. Says a fault was captured even after the event has passed. |
+| TP207 / TP208 | GND | Ground reference for the six signals above, one per channel. |
+| TP209 / TP210 / TP211 | +12V, +5V, +3.3V | Rail check at the regulators, not at a load. |
+| TP212 | GND | Ground reference for the three rails. |
+| TP213 | GND | Bridge-side ground, in the clear channel between the two channels. |
+
+### Ground first, then signals
+
+The placement rule was that a signal measurement is only as good as its ground reference, so
+the three ground points were placed first, against the part each group serves, and the signal
+points were clustered around **their own ground** rather than against the net they measure.
+A 6 mm trace out to a test point costs nothing on these signals. A 60 mm probe ground lead
+turns a clean edge into ringing that is not on the board.
+
+Worst signal-to-ground distance came out at 7.50 mm (TP205), against a limit of 8.0 mm written
+into the tool. Every other pair is under 6.5 mm.
+
+### What the first solve got wrong
+
+TP213 landed at (134.6, 62.0), in the 4.5 mm gap between Q2 and Q1 — geometrically legal,
+under the heatsink extrusion, and impossible to reach with a probe hook. The same solve also
+scattered each channel's ground as far as 45 mm from the signals it was supposed to reference,
+which defeats the entire point of having it. Both came from optimising distance-to-net instead
+of distance-to-ground, and from a keepout list that had the heatsink shadow but not the
+question "can a hand get here."
+
+Re-solved with grounds placed first. TP213 now sits at (183.25, 70.0), in the open channel
+between the channels.
+
+### Keepouts the search respected
+
+Courtyards and the board edge, the heatsink shadow, and the four 10.7 mm coil-pour corridors
+on B.Cu. That last one matters because these are through-hole wire loops: a barrel dropped in
+a corridor punches a hole through a pour that has to carry 30 A.
+
+### One silkscreen collision, fixed by moving the label
+
+TP204 and TP208 sit 3.72 mm apart and both inherited the library's default reference position
+at (0.7, 2.5), which put their labels 3.60 mm apart in x against a 3.75 mm text width. TP204's
+label moved to (-2.6, 0), to the left of the loop. Nothing electrical moved. `check_silk` now
+reports zero overlapping pairs.
+
+### State after
+
+`tools/place_testpoints.py`, dry run then `--write`, backup to `final_lev.kicad_pcb.bak1`.
+
+```
+test points patched  : 13
+silk labels moved    : 1  TP204
+line endings         : CRLF 62554 -> 62554   bare LF 0 -> 0
+courtyard overlaps   : 0
+```
+
+`tools/lay.py`: **0 FAIL, 10 warn**, down from 1 FAIL / 10 warn. Commutation loops unchanged
+at 12.9 / 13.1 / 16.7 / 16.8 mm, heatsink shadow still clear, 197 footprints.
+
+### A12 corrected as a consequence
+
+Pushing the test points to the board produced `No net found ... no pin 1 in symbol` on H1-H4.
+My first answer, that the holes are plain unplated-net holes with no pad and no net, was
+**wrong**, and is corrected here. They are `MountingHole_3.2mm_M3_Pad`: a plated 3.2 mm hole
+with a 6.4 mm pad on all four copper layers, carrying no net. The warning comes from the
+symbol, which has no pin for the pad to take a net from. The A12 row had separately claimed a
+0 Ω 1206 chassis-bond jumper fitted DNF; that part does not exist in the netlist and never
+did. A12 now records both facts and the real fix, which is a symbol swap rather than a re-spin.
+
+The wrong answer came from a parser of mine that searched for `(net <number> "NAME")`. This
+file writes `(net "NAME")` with no number, on all 506 pads. The regex matched nothing, returned
+an empty list, and I read empty as *absent* instead of *unmatched*. Same failure mode as 20.8
+and as the first version of `check_pad_orientation`: my own tool's silence was taken as
+evidence. Every parser here should assert that it matched something before anyone believes
+what it did not find.
+
+---
+
+## 20.11 The footprint-mismatch warning was real, and 20.8 was wrong about it
+
+`§20.8` looked at KiCad's `lib_footprint_mismatch` warnings, checked the geometry against the
+library, found it identical, failed to isolate a cause and set the severity to Ignore. That was
+the wrong call, and this section replaces it. The warning was accurate. Something in those
+footprints genuinely did not match the library, and it was not cosmetic.
+
+### What the DRC report actually contained
+
+Run 2026-08-27 13:47 on KiCad 10.0.5, two separate things:
+
+| Kind | Count | Meaning |
+|---|---|---|
+| `unconnected_items` | ~300 | The board has 0 tracks, 0 vias and 1 zone, so every connection is unrouted. This is the routing to-do list, not a fault. It also confirms the netlist pushed cleanly: every pad carries the net it should. |
+| `lib_footprint_mismatch` | 18 | All capacitors. This one was real. |
+
+### The defect
+
+A pad's `(at x y angle)` in this file is the pad's **absolute** angle, so a body rotated to 90
+normally has its pads written at 90. Twenty footprints did not follow their body:
+
+```
+C1  C20  C227  C213  C239        pads 90 deg off  -> the 1.175 x 1.450 mm pad turned across the part
+C3  C5  C6  C7  C8  C210
+C212 C214 C215 C216 C217
+C235  C237                       pads 180 deg off -> same rectangle, cosmetic
+```
+
+Off by 180 a rectangle is unchanged. Off by 90 the pad's length and width swap and the copper
+stops matching the part's terminations. Five parts were in that state, and they would have been
+fabricated that way.
+
+Cause: `rot_ceramics.py`, `place_caps.py` and `place_review.py` all rewrote a footprint's `(at)`
+line and left its pads behind. Every footprint KiCad itself rotated on this board obeys the rule
+(C19 at 180 with pads at 180, C25/C26/C27 and C203 at 90 with pads at 90, D1 at 180 with pads at
+180), which is the in-file evidence for what the convention is.
+
+### The fix
+
+Pcbnew, **Tools -> Update Footprints from Library**, all footprints, field-reset boxes left
+unchecked. KiCad rewrote each footprint body from the library at its existing position and
+orientation. No footprint moved or rotated: 197 before, 197 after, all 197 at identical
+coordinates. The only other change was 23 reference-designator label positions, which KiCad
+re-placed itself, and that incidentally resolved the TP204 / TP208 silkscreen overlap that
+`place_testpoints.py` had hand-fixed. `check_silk` still reports 0 overlapping pairs.
+
+### The check, and the mistake inside the first version of it
+
+`lay.py` gained `check_pad_orientation`. Its first version assumed a pad's angle should equal its
+body's angle, which flagged D2 and D205, the two SMC TVS clamps, as broken. They are not.
+`Diode_SMD:D_SMC_Handsoldering` declares its pads 90 degrees off its own outline in the library,
+and D2 and D205 inherit that honestly. Running the library update proved it: KiCad rewrote both
+from the library and left them exactly where they were.
+
+The rule is therefore not "pad angle equals body angle" but **"pad angle minus body angle is the
+same for every placement of the same library footprint."** The baseline is whatever that
+footprint's other instances use. That is what the check now does, and it is what made the five
+real failures visible in the first place: 5 parts sitting at 90 in a population of 41 that was
+otherwise 0.
+
+Regression tested both ways. Against the pre-update board it reports the 5 FAIL and 13 warn.
+Against the current board it reports zero, and no longer accuses D2 or D205.
+
+### Worth naming
+
+The 20.8 error and the first-version-of-the-check error are the same error twice: **a check I
+wrote said the geometry was fine, so a warning the application raised got suppressed.** KiCad was
+right both times. A tool's warning outranks my tool's clean bill of health until my tool has been
+shown to look at the same thing the application is looking at.
+
+### State after
+
+`tools/lay.py`: **0 FAIL, 10 warn.** 197 footprints, 0 courtyard overlaps, commutation loops
+unchanged at 12.9 / 13.1 / 16.7 / 16.8 mm, heatsink shadow clear, 13 test points, 0 silkscreen
+collisions.
 
 ---
 

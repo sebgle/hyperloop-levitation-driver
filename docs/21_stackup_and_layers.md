@@ -234,3 +234,94 @@ that merely need to arrive get routed around them.
    line, sits at 767 Ω, and runs 45 mm past the bridge: keep it over the plane and away from any
    switching node.
 7. **GND fill and stitching**, then DRC.
+
+---
+
+## 21.8 The coil pours as built
+
+Drawn 2026-08-27. All four are on B.Cu, one polygon each, plus a small F.Cu landing zone
+on each A leg. Measured with `tools/pour_check.py`, which rasterises the real outline at
+0.05 mm rather than trusting its bounding box.
+
+| Net | Narrowest cut in the conductor | dT at 30 A | Closest foreign copper |
+|---|---|---|---|
+| `/COIL_A1` | 11.00 mm | 19 C | 0.800 mm to H1 |
+| `/COIL_A2` | 11.00 mm | 19 C | 0.800 mm to H2 |
+| `/COIL_B1` | 10.70 mm | 20 C | 0.331 mm to Q4.3 [GND] |
+| `/COIL_B2` | 10.70 mm | 20 C | 0.337 mm to Q203.2 [+60V] |
+
+IPC-2221 external, 2 oz, `I = 0.048 * dT^0.44 * A^0.725`, A in mil^2. The 10.7 mm the
+project sizes to is 20.3 C, not 20.0, which matters only because a checker comparing against
+a computed 20 C flags the very width it is supposed to bless.
+
+### The two legs are not built the same way, and the reason is the shunt
+
+The A legs terminate on R11 and R219, which are surface mount. A pour on B.Cu cannot touch a
+front pad, so each A leg needs a front landing zone off the shunt and a via field down to the
+back: **15 vias at 2.0 A each on CH1, 19 at 1.58 A on CH2**, HV_POWER size, 1.2 mm pad on a
+0.6 mm drill.
+
+The B legs terminate on Q3/Q4 and Q203/Q204 and on the yoke connectors, all through-hole, so
+the pour reaches every one of them down its own barrel. **No vias at all.**
+
+That asymmetry is worth stating plainly because it looks like an inconsistency and is not: it
+is the difference between a surface-mount current-sense resistor and a TO-220 lead.
+
+### The fence at each TO-220 row
+
+Pins sit on 2.54 mm pitch, and on both B legs each coil pin has a foreign neighbour 0.64 mm
+away -- a gate on one side, a rail pin on the other. A single rectangle over the row would
+enclose the gate pin and both rail pins, stranding each as a 0.3 mm island inside a node that
+swings the full bus every cycle.
+
+Both B pours instead stop below the row and send two narrow lobes up to the coil pins only.
+No foreign pad ends up inside any coil pour on this board. The copper arriving at each pin is
+then about 1.9 mm wide, which is the pad. **A TO-220 lead is the constriction and no pour
+geometry can widen it** -- 4.7 to 5.0 mm total across both lobes, and `pour_check` now
+recognises a cut that lands on the net's own pads and says so rather than calling it a neck.
+
+### CH2's A leg is fenced too, and that one is a placement consequence
+
+R11 sits at 180 degrees and R219 at 0, so the two shunts are 180-degree rotations of each
+other rather than mirror images. Each block is internally consistent, tap and filter and
+amplifier pin all on the same side, so nothing looks wrong until you try to take 30 A off the
+pad:
+
+```
+R11.4  /COIL_A1  x[105.35,108.65] y[64.85,66.88]   open space directly above
+R219.4 /COIL_A2  x[251.33,254.63] y[66.12,68.15]   SNS_N sits 0.51 mm above it
+```
+
+CH1's coil pad faces an empty band. CH2's is fenced by its own Kelvin tap, so its F.Cu zone
+has to notch around SNS_N, and the current crosses that fence through two channels totalling
+6.45 mm over a 1.36 mm length. Short constrictions between large copper areas are governed by
+spreading rather than by the steady-state IPC curve, so the real rise is well under what
+6.45 mm of continuous trace would give, but it is the one place where CH2 is worse than CH1.
+
+The clean fix is rotating R219 to match R11, which drags R210, R211 and U203 with it to keep
+the sense pair uncrossed. That is a block rework for a 1.4 mm constriction, so it is recorded
+rather than done.
+
+### What measurement caught that drawing did not
+
+The pours were first built as overlapping rectangles, then redrawn by hand as single
+polygons. The redraw was right everywhere that was hard -- both lobe pairs survived, no
+foreign pad was enclosed, all 34 vias stayed inside their zones on both layers, and
+`COIL_A1_F` came out better than the rectangle it replaced because its staircase swallows
+R11 pad 4 whole instead of clipping its edge.
+
+What it got wrong was one horizontal edge on each B leg landing at y=134 instead of 138.2.
+That made both bands **6.50 mm where they needed 10.7**, held for 33 mm on CH1 and 27 mm on
+CH2, for a 46 C rise. Invisible on canvas. Obvious the moment something measured it.
+
+`lay.py` could not have caught it: its zone check treats a zone as its bounding box, which is
+exact only while zones are rectangles. `pour_check.py` exists because that assumption died
+the moment the pours became polygons.
+
+### Still open on these nets
+
+`U2.6`, `C16.2`, `R6.1` and `U207.6`, `C226.2`, `R224.1` -- the high-side drivers' VS
+references, their bootstrap capacitors and a gate resistor each. All surface mount, none
+carrying coil current. They are a routing job, and DRC will keep listing the coil nets as
+unconnected until it is done.
+
