@@ -547,6 +547,35 @@ def check_pad_orientation():
               'library footprint. 0 mismatched')
 
 
+def _poly_in(pt, poly):
+    x, y = pt
+    n, c = len(poly), False
+    for i in range(n):
+        x0, y0 = poly[i]
+        x1, y1 = poly[(i + 1) % n]
+        if (y0 > y) != (y1 > y) and x < (x1 - x0) * (y - y0) / (y1 - y0) + x0:
+            c = not c
+    return c
+
+
+def _cells(z, step=0.25):
+    """Rasterised interior of a zone, memoised. Bounding boxes lie about L shapes."""
+    if 'cells' not in z:
+        xs = [p[0] for p in z['pts']]
+        ys = [p[1] for p in z['pts']]
+        S = set()
+        y = min(ys) + step / 2
+        while y < max(ys):
+            x = min(xs) + step / 2
+            while x < max(xs):
+                if _poly_in((x, y), z['pts']):
+                    S.add((round(x, 2), round(y, 2)))
+                x += step
+            y += step
+        z['cells'] = S
+    return z['cells']
+
+
 def check_zones():
     """Overlapping copper zones need distinct priorities, same net or not.
 
@@ -559,8 +588,11 @@ def check_zones():
     block early and silently loses zones. That mistake has cost this project
     three wrong answers already.
 
-    Overlap is tested on bounding boxes. Every zone here is a rectangle, so that
-    is exact; it would over-report on an L-shaped outline.
+    Overlap is tested by rasterising both outlines at 0.25 mm, not by comparing
+    bounding boxes. The +60 V plane on In2.Cu is L-shaped -- a body plus a finger
+    reaching down to J101 -- and its bounding box overlaps both GND fills beside
+    it while the copper does not touch them anywhere. A box test called that a
+    collision twice. A checker that cries wolf is one you learn to skip.
     """
     print('\nzone overlap and priority')
     lines = s.split('\n')
@@ -579,9 +611,10 @@ def check_zones():
                 pm = re.search(r'\(polygon\n\t\t\t\(pts\n((?:.|\n)*?)\n\t\t\t\)', b)
                 pts = re.findall(r'\(xy ([-\d.]+) ([-\d.]+)\)', pm.group(1)) if pm else []
                 if pts:
+                    pts_f = [(float(a), float(c)) for a, c in pts]
                     xs = [float(a) for a, _ in pts]
                     ys = [float(c) for _, c in pts]
-                    Z.append({'name': nm.group(1) if nm else '?',
+                    Z.append({'pts': pts_f, 'name': nm.group(1) if nm else '?',
                               'layer': ly.group(1) if ly else '?',
                               'net': nt.group(1) if nt else '?',
                               'pri': int(pr.group(1)) if pr else 0,
@@ -603,6 +636,8 @@ def check_zones():
                 continue
             if not (min(a['bb'][1], b['bb'][1]) - max(a['bb'][0], b['bb'][0]) > 1e-9
                     and min(a['bb'][3], b['bb'][3]) - max(a['bb'][2], b['bb'][2]) > 1e-9):
+                continue
+            if not _cells(a) & _cells(b):
                 continue
             if a['pri'] == b['pri']:
                 n += 1

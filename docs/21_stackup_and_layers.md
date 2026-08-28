@@ -325,3 +325,71 @@ references, their bootstrap capacitors and a gate resistor each. All surface mou
 carrying coil current. They are a routing job, and DRC will keep listing the coil nets as
 unconnected until it is done.
 
+---
+
+## 21.9 Planes are not traces, and A17 was computing the wrong one
+
+A17 said the bulk-to-bridge feed needs 28.0 mm and concluded the 13 mm corridor could not carry
+it. That number came from the IPC-2221 trace formula. The feed is not a trace.
+
+Push the same formula onto In2.Cu at 1 oz and it asks for **146 mm** of width for 60 A at
+dT = 20 C. The board is 160 mm wide. When a formula demands the entire board, the honest
+reading is that it is being asked a question it was not calibrated for: it models a narrow
+conductor losing heat to the laminate around it, and a plane is its own heat spreader.
+
+### Count squares instead
+
+```
+1 oz copper   0.494 mOhm / square          2 oz copper   0.247 mOhm / square
+
+cap row y=143 to bridge row y=62     81 mm long, about 150 mm wide
+                                     0.54 squares  ->  0.267 mOhm
+                                     16 mV and 0.96 W at 60 A
+
+spreading at one bulk cap pad        a = 1.2 mm, b = 8.5 mm   0.154 mOhm
+  six of them in parallel                                     0.026 mOhm
+spreading at one FET drain pin       a = 0.98 mm, b = 8 mm    0.165 mOhm
+                                     5 mV and 0.15 W at its own 30 A
+
+end to end                           about 0.46 mOhm
+                                     27 mV and 1.65 W at 60 A
+                                     0.14 mW/mm2 over 150 x 80 mm
+```
+
+Two orders of magnitude below what a board dissipates comfortably. The corridor width was never
+the constraint. What matters for a plane is that it stays a plane.
+
+### Which is why In2.Cu still carries no signals
+
+The original reason stands and is now the only reason: a route across In2.Cu cuts the plane, and
+a cut plane forces the current around it. That is how a plane turns back into a trace, and the
+trace numbers really are as bad as A17 first suggested.
+
+### The power path needs no vias
+
+Every +60 V pad that carries current is through-hole:
+
+```
+Q1.2  Q3.2  Q203.2  Q201.2       FET drains, y = 62
+C101.1 ... C106.1                bulk caps,  y = 143
+J101.1                           bus input,  (153.5, 182.5)
+```
+
+So an In2.Cu plane reaches all eleven down their own barrels. Vias are needed only to bring the
+surface-mount bridge ceramics on F.Cu onto the plane, and those carry ripple, not bus current.
+
+### The In2.Cu split, and why the bottom of the board is not +60 V
+
+The stackup is F.Cu / In1 GND / In2 +60V / B.Cu, so B.Cu's nearest plane is In2. Over the power
+section that is fine: the bus is an AC ground, bypassed by six bulk caps and by the interplane
+capacitance of In1 against In2 (about 0.9 nF across the 0.97 mm core).
+
+Under the IO connectors it is not fine. J202 carries the PWM inputs, the enable lines and the
+two current-sense outputs off the board, and those are the signals whose reference quality
+matters most. So In2 is split: **+60 V above y = 150 plus a finger down to J101, GND below it.**
+The finger runs x 146 to 162, which clears J202's leftmost pin at x = 169 by 7 mm.
+
+A split plane is a hazard wherever a signal crosses the split. Nothing crosses it yet. Anything
+routed on B.Cu across y = 150 between x = 143 and x = 165 later will need a return path checked
+by hand.
+
