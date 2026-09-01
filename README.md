@@ -9,7 +9,7 @@ requirements. The schematic, board layout, documentation and verification script
 repository holds the KiCad 10 project along with the design notes, the reviews, and the scripts
 that check the layout.
 
-**Status: schematic done and verified. Placement done. Routing under way. Fabrication after that.**
+**Status: schematic done and verified. Placement done. Routing under way.**
 
 ## Requirements
 
