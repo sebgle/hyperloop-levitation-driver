@@ -135,9 +135,6 @@ Three of them matter:
 
 ## Mistakes and what they changed
 
-Every one of these was caught before it reached a manufacturer, and each one changed how the
-work was checked afterwards.
-
 **Measured the wrong thing.** Six large capacitors were supposed to fit between the two coil
 connectors. Comparing the metal pads, they fit. Comparing the space each part actually needs
 around it, they did not, because the connector needs far more room than its pads suggest. The
